@@ -11,7 +11,7 @@
 | Design system | **shadcn-svelte** on **Tailwind CSS v4** | Components are copied into the repo, so we own and restyle them. Theming is CSS variables, which map directly onto the logo palette. |
 | Code highlighting | **Shiki**, via an mdsvex highlighter | Highlights at build time and ships no JS. Two themes, one per colour mode. |
 | Fonts | Space Grotesk 700, IBM Plex Sans, IBM Plex Mono (self-hosted with `@fontsource`) | The same fonts the logo uses. |
-| Hosting | **GitHub Pages** via GitHub Actions | The repo already lives on GitHub. Cloudflare Pages or Netlify work without changes too. |
+| Hosting | **Cloudflare Pages** with Git integration, on **texcavator.dev** | Builds on every push, gives every branch and PR a preview URL, and serves from Cloudflare's CDN. |
 | Package manager | pnpm | |
 
 **Why shadcn-svelte rather than Skeleton:** Skeleton ships with its own opinionated theme system and preset look. The brand here is already fixed by the logo (warm earth tones, CRT green, mono type), and a content site only needs a handful of primitives: Button, Badge, Card, Separator, Sheet for the mobile nav, Tooltip, and Toggle for the theme switch. With shadcn we can recolour exactly those, and nothing else ends up in the bundle.
@@ -55,9 +55,11 @@ Two things to fix during import:
 ## 4. Information architecture
 
 ```
-/                     Home: hero with logo + tagline, latest posts, featured "dig"
-/posts                All posts, newest first
-/posts/[slug]         A post
+/                     Home: hero with logo + tagline, one strip per section, latest posts
+/posts                All posts, newest first, filterable by section
+/fossils              FOSSils section landing (intro + its posts)
+/ettymology           eTTYmology section landing
+/[section]/[slug]     A post, e.g. /ettymology/ping
 /tags                 Tag index (e.g. unix, games, formats, cloud-native, security)
 /tags/[tag]           Posts with that tag
 /about                What Texcavator is, who writes it, how sources are handled
@@ -65,15 +67,39 @@ Two things to fix during import:
 /sitemap.xml          Sitemap (prerendered +server.ts)
 ```
 
+## 4b. Sections
+
+Every post belongs to exactly one **section**, a recurring series with its own name, intro, colour and small glyph. Tags still cut across sections.
+
+| Section | Slug | What goes in it | Shortlist topics that fit |
+|---|---|---|---|
+| **FOSSils** | `/fossils` | Origin stories and lineages of open-source projects: who started them, what they grew out of, what died along the way. | curses ← Rogue, ncurses and Thomas Dickey, Krustlet → SpinKube, GFS → Hadoop → Spark, Docker at dotCloud, chroot → namespaces → bubblewrap, GNU screen → CBOR |
+| **eTTYmology** | `/ettymology` | Where a name, word, path or key binding comes from. Short pieces, often under 800 words. | Why `/usr` exists, Ping and sonar, Hadoop's toy elephant, Kubernetes and "Seven of Nine", Ctrl-S and XON/XOFF, ¥ as the path separator, termcap/terminfo |
+
+Possible further sections, only if the material keeps piling up:
+- **Compat Layers**: deliberate bug-for-bug compatibility (SimCity and Windows 95, Excel's 1900 leap year, AARD code).
+- **Glitch Strata**: games and hardware pushed past their limits (MissingNo, Crash Bandicoot's paging, the Mario 64 upwarp, NES Tetris).
+- **Dig Site**: long reads and multi-part series (capability OSes in two parts, Trusting Trust and xz).
+
+Implementation:
+- `src/lib/sections.ts` is the single source of truth: `{ slug, name, tagline, description, accent, glyph }[]`. The zod schema checks `section` against it, so adding a section is one entry plus a folder.
+- Posts live in `src/content/<section>/<slug>.md`. The URL is `/<section>/<slug>`, rendered by `src/routes/[section]/[slug]`, with `entries()` listing every pair for prerendering.
+- **Wordmark styling:** the names are puns on embedded capitals, the way the logo highlights the "x". Render them with the pun letters in the accent colour: **FOSS**ils and e**TTY**mology. A `SectionName.svelte` component handles this so it looks the same in nav, badges and headings.
+- **Section accents** come from the logo palette, so the brand stays one family. FOSSils uses Rust (an earth layer, fitting the fossil theme). eTTYmology uses Phosphor-on-CRT (terminal green, fitting TTY).
+- **Glyphs:** a small fossil/ammonite and a blinking `▍` cursor, drawn as inline SVG in the logo's line weight.
+- Each section gets its own RSS feed (`/fossils/rss.xml`) next to the global one.
+- The home page shows one strip per section, with its name, one-line tagline and its 3 latest posts.
+
 ## 5. Content model
 
-Posts live in `src/content/posts/<slug>.md`:
+Posts live in `src/content/<section>/<slug>.md`:
 
 ```md
 ---
 title: "curses was pulled out of Rogue"
 date: 2026-10-20
 summary: "Ken Arnold needed Rogue to draw a dungeon on any terminal. The library outlived the game."
+section: fossils       # fossils | ettymology | … (see §4b)
 tags: [unix, terminals, games]
 era: 1980              # optional, for a later timeline view
 cover: ./cover.png     # optional
@@ -84,7 +110,7 @@ sources:
 ---
 ```
 
-- Posts are loaded with `import.meta.glob('/src/content/posts/*.md', { eager: true })` in `src/lib/posts.ts`. That module returns sorted metadata, hides drafts in production, and computes reading time.
+- Posts are loaded with `import.meta.glob('/src/content/*/*.md', { eager: true })` in `src/lib/posts.ts`. That module returns sorted metadata, hides drafts in production, and computes reading time.
 - A frontmatter schema is validated with **zod** at build time, so a typo in a date or tag fails the build.
 - **Sources are a first-class field.** This is a history blog, so every post renders a "Sources" section, and footnotes (via `remark-footnotes` / GFM) link to it.
 - Seed content comes from the "Strongest candidates" in the topic shortlist doc: curses/Rogue, the Confused Deputy, why `/usr` exists, Crash Bandicoot's paging, and Krustlet → SpinKube.
@@ -111,21 +137,23 @@ texcavator/
 ├─ src/
 │  ├─ app.css                 # Tailwind v4 + tokens
 │  ├─ app.html
-│  ├─ content/posts/*.md
+│  ├─ content/<section>/*.md   # fossils/, ettymology/
 │  ├─ lib/
 │  │  ├─ components/ui/…      # shadcn-svelte (generated)
 │  │  ├─ components/…         # custom
 │  │  ├─ posts.ts             # glob + zod + sort
+│  │  ├─ sections.ts          # section registry
 │  │  └─ site.ts              # title, tagline, url, social
 │  └─ routes/
 │     ├─ +layout.svelte / +layout.ts   # export const prerender = true
 │     ├─ +page.svelte
-│     ├─ posts/+page.svelte, posts/[slug]/+page.ts|svelte
+│     ├─ posts/+page.svelte
+│     ├─ [section]/+page.ts|svelte, [section]/[slug]/+page.ts|svelte
 │     ├─ tags/…, about/…
 │     ├─ rss.xml/+server.ts, sitemap.xml/+server.ts
-├─ static/brand/…, static/favicon.svg
+├─ static/brand/…, static/favicon.svg, static/_headers, static/_redirects, .nvmrc
 ├─ mdsvex.config.js, svelte.config.js, vite.config.ts
-└─ .github/workflows/deploy.yml
+└─ .github/workflows/check.yml   # lint/typecheck/links; Cloudflare deploys
 ```
 
 ## 8. SEO and polish
@@ -135,23 +163,32 @@ texcavator/
 - Accessibility: WCAG AA contrast. Rust on the cream background needs checking for body links; use Umber if it falls short. Visible focus rings, skip link, `prefers-reduced-motion` respected.
 - Performance: zero client JS on post pages except the theme toggle, fonts subset and preloaded, Lighthouse at 100 as the target.
 
-## 9. Build and deploy
+## 9. Build and deploy (Cloudflare Pages + texcavator.dev)
 
-- `svelte.config.js`: `adapter-static` with `fallback: undefined`, `prerender.entries: ['*']`, and `paths.base` from `BASE_PATH`. The base path is needed for a GitHub Pages project URL like `jvanbuel.github.io/texcavator`, and can be dropped once a custom domain is set.
-- `.github/workflows/deploy.yml`: on push to `main`, run pnpm install, `pnpm check`, `pnpm build`, then `actions/upload-pages-artifact` and `actions/deploy-pages`.
-- PR checks: `svelte-check`, `prettier --check`, `eslint`, and a link checker over the built output (e.g. `lychee`), so sources don't rot silently.
+- **Adapter:** keep `@sveltejs/adapter-static`. The site is fully prerendered, so no Worker runtime is needed. Switch to `@sveltejs/adapter-cloudflare` only if server routes appear later (forms, view counts). No `paths.base`, because the site is served at the domain root.
+- **Pages project:** connect the GitHub repo in the Cloudflare dashboard (Workers & Pages → Create → Pages → Connect to Git).
+  - Framework preset: SvelteKit. Build command: `pnpm build`. Output directory: `build`.
+  - Pin Node with `.nvmrc` (e.g. `22`) or a `NODE_VERSION` env var. pnpm is detected from `pnpm-lock.yaml`.
+  - Production branch is `main`. Every other branch and PR gets a `<hash>.texcavator.pages.dev` preview.
+- **Domain:** add `texcavator.dev` (and `www`) under the project's Custom domains. If the domain's DNS is already on Cloudflare this is one click. Otherwise move the nameservers to Cloudflare, or add a CNAME to `texcavator.pages.dev`. `.dev` is HSTS-preloaded, so HTTPS is mandatory, and Cloudflare issues the certificate automatically.
+- **`static/_redirects`:** `https://www.texcavator.dev/* https://texcavator.dev/:splat 301`. Redirects for renamed slugs also go here.
+- **`static/_headers`:** long cache for `/_app/immutable/*`, plus security headers (CSP, `X-Content-Type-Options`, `Referrer-Policy`).
+- **URLs:** SvelteKit's default `trailingSlash: 'never'` emits `about.html`, and Pages serves it at `/about`. The two match, so leave the default.
+- **PR checks** stay in GitHub Actions (`svelte-check`, prettier, eslint, `lychee` link checker over `build/`), while Cloudflare does the building and deploying.
+- **Analytics (optional):** Cloudflare Web Analytics. It's cookieless, so no consent banner is needed.
+- Note: Cloudflare now also offers static sites on **Workers with static assets**, and points new projects there. Pages still works well for this site. Moving later is a config change (`wrangler.jsonc` with `assets.directory = "build"`), not a rewrite.
 
 ## 10. Milestones
 
 1. **Scaffold**: `npx sv create` (minimal, TS, Tailwind, mdsvex, prettier, eslint), adapter-static, `shadcn-svelte init`, fonts.
 2. **Brand**: tokens in `app.css`, logo assets imported and fixed, `Logo`, header, footer, theme toggle, favicons.
-3. **Blog engine**: `posts.ts` with zod, post layout, list, tags, RSS, sitemap, Shiki.
-4. **Content**: about page and 2–3 seed posts from the shortlist.
-5. **Ship**: GitHub Pages workflow, OG tags, Lighthouse and a11y pass.
+3. **Blog engine**: `sections.ts`, `posts.ts` with zod, section landings, post layout, tags, RSS (global + per section), sitemap, Shiki.
+4. **Content**: about page, one seed post per section (e.g. FOSSils: curses ← Rogue; eTTYmology: why `/usr` exists).
+5. **Ship**: Cloudflare Pages project, texcavator.dev domain, `_headers`/`_redirects`, OG tags, Lighthouse and a11y pass.
 6. **Later**: per-post OG images, a timeline view by `era`, search (Pagefind runs on static output), newsletter.
 
 ## Open questions
 
-- Domain: `texcavator.dev`, a custom domain, or the `github.io` URL to start?
+- Are FOSSils and eTTYmology the only sections at launch, or are there others already named?
 - Comments: none, or Giscus (GitHub Discussions)?
 - Language: English only?
