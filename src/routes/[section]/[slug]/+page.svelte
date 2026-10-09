@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
-	import { Badge } from '#lib/components/ui/badge/index.ts';
+	import TagBadge from '#lib/components/TagBadge.svelte';
 	import { Separator } from '#lib/components/ui/separator/index.ts';
 	import SectionName from '#lib/components/SectionName.svelte';
 	import Seo from '#lib/components/Seo.svelte';
@@ -53,9 +53,7 @@
 
 	{#if post.tags.length}
 		<p class="mt-8 flex flex-wrap gap-2">
-			{#each post.tags as tag (tag)}<Badge variant="outline" href={resolve('/tags/[tag]', { tag })}
-					>{tag}</Badge
-				>{/each}
+			{#each post.tags as tag (tag)}<TagBadge {tag} />{/each}
 		</p>
 	{/if}
 </article>

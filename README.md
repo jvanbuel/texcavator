@@ -35,6 +35,8 @@ sources:
 
 Invalid frontmatter fails the build with the file name and the offending field.
 
+Tags get an icon from `src/lib/tag-icons.ts` (brand logos via Simple Icons, concepts via Lucide). Add a line there for new tags; unmapped tags fall back to a generic tag glyph.
+
 ## Deploy (Cloudflare Pages)
 
 Create a Pages project from this repo with build command `pnpm build` and output directory `build`, then add `texcavator.dev` as a custom domain. `static/_headers` and `static/_redirects` are picked up automatically. GitHub Actions (`.github/workflows/check.yml`) only runs checks.

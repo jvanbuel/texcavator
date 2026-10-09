@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
 	import type { Post } from '#lib/server/posts.ts';
-	import { Badge } from '#lib/components/ui/badge/index.ts';
+	import TagBadge from '#lib/components/TagBadge.svelte';
 	import * as Card from '#lib/components/ui/card/index.ts';
 	import SectionName from './SectionName.svelte';
 
@@ -29,7 +29,7 @@
 		<Card.Content class="relative z-10">
 			<div class="flex flex-wrap gap-2">
 				{#each post.tags as tag (tag)}
-					<Badge variant="outline" href={resolve('/tags/[tag]', { tag })}>{tag}</Badge>
+					<TagBadge {tag} />
 				{/each}
 			</div>
 		</Card.Content>

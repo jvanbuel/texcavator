@@ -2,6 +2,7 @@
 	import { resolve } from '$app/paths';
 	import * as Card from '#lib/components/ui/card/index.ts';
 	import Seo from '#lib/components/Seo.svelte';
+	import TagIcon from '#lib/components/TagIcon.svelte';
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
@@ -13,14 +14,21 @@
 <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
 	{#each data.tags as { tag, count, posts } (tag)}
 		<Card.Root class="relative transition-colors focus-within:ring-ring hover:ring-ring">
-			<Card.Header>
-				<Card.Title class="font-mono text-lg">
-					<a
-						href={resolve('/tags/[tag]', { tag })}
-						class="after:absolute after:inset-0 hover:underline">{tag}</a
-					>
-				</Card.Title>
-				<Card.Description>{count} {count === 1 ? 'post' : 'posts'}</Card.Description>
+			<Card.Header class="flex items-center gap-4">
+				<span
+					class="flex size-12 shrink-0 items-center justify-center rounded-lg bg-muted text-primary"
+				>
+					<TagIcon {tag} class="size-6" />
+				</span>
+				<div class="grid gap-1">
+					<Card.Title class="font-mono text-lg">
+						<a
+							href={resolve('/tags/[tag]', { tag })}
+							class="after:absolute after:inset-0 hover:underline">{tag}</a
+						>
+					</Card.Title>
+					<Card.Description>{count} {count === 1 ? 'post' : 'posts'}</Card.Description>
+				</div>
 			</Card.Header>
 			<Card.Content>
 				<ul class="grid gap-1 text-sm text-muted-foreground">
