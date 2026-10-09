@@ -1,18 +1,18 @@
 # Texcavator website — plan
 
-> *digging up tech history*: a static blog of short, well-sourced stories about the decisions behind the tools we use.
+> _digging up tech history_: a static blog of short, well-sourced stories about the decisions behind the tools we use.
 
 ## 1. Stack
 
-| Concern | Choice | Why |
-|---|---|---|
-| Framework | **SvelteKit 2 + Svelte 5** with `@sveltejs/adapter-static` | Prerenders every route to plain HTML. No server needed. |
-| Markdown | **mdsvex** | `.md` posts with frontmatter, plus Svelte components inside posts when a story needs a diagram or callout. |
-| Design system | **shadcn-svelte** on **Tailwind CSS v4** | Components are copied into the repo, so we own and restyle them. Theming is CSS variables, which map directly onto the logo palette. |
-| Code highlighting | **Shiki**, via an mdsvex highlighter | Highlights at build time and ships no JS. Two themes, one per colour mode. |
-| Fonts | Space Grotesk 700, IBM Plex Sans, IBM Plex Mono (self-hosted with `@fontsource`) | The same fonts the logo uses. |
-| Hosting | **Cloudflare Pages** with Git integration, on **texcavator.dev** | Builds on every push, gives every branch and PR a preview URL, and serves from Cloudflare's CDN. |
-| Package manager | pnpm | |
+| Concern           | Choice                                                                           | Why                                                                                                                                  |
+| ----------------- | -------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
+| Framework         | **SvelteKit 3 + Svelte 5** with `@sveltejs/adapter-static`                       | Prerenders every route to plain HTML. No server needed.                                                                              |
+| Markdown          | **mdsvex**                                                                       | `.md` posts with frontmatter, plus Svelte components inside posts when a story needs a diagram or callout.                           |
+| Design system     | **shadcn-svelte** on **Tailwind CSS v4**                                         | Components are copied into the repo, so we own and restyle them. Theming is CSS variables, which map directly onto the logo palette. |
+| Code highlighting | **Shiki**, via an mdsvex highlighter                                             | Highlights at build time and ships no JS. Two themes, one per colour mode.                                                           |
+| Fonts             | Space Grotesk 700, IBM Plex Sans, IBM Plex Mono (self-hosted with `@fontsource`) | The same fonts the logo uses.                                                                                                        |
+| Hosting           | **Cloudflare Pages** with Git integration, on **texcavator.dev**                 | Builds on every push, gives every branch and PR a preview URL, and serves from Cloudflare's CDN.                                     |
+| Package manager   | pnpm                                                                             |                                                                                                                                      |
 
 **Why shadcn-svelte rather than Skeleton:** Skeleton ships with its own opinionated theme system and preset look. The brand here is already fixed by the logo (warm earth tones, CRT green, mono type), and a content site only needs a handful of primitives: Button, Badge, Card, Separator, Sheet for the mobile nav, Tooltip, and Toggle for the theme switch. With shadcn we can recolour exactly those, and nothing else ends up in the bundle.
 
@@ -20,22 +20,23 @@
 
 The source is the **Texcavator Logo** artifact (https://claude.ai/artifact/5KYn8McuTkAatE4ncGf2dT). Its palette maps onto shadcn's CSS variables in `src/app.css`:
 
-| Token | Light | Dark | Logo name |
-|---|---|---|---|
-| `--background` | `#FBF7F0` | `#161B20` | page bg |
-| `--card` | `#FFFFFF` | `#1E252C` | surface |
-| `--foreground` | `#2B2B2B` Charcoal | `#F3E9D7` Sand | |
-| `--muted-foreground` | `#7A6A57` | `#B6A891` | |
-| `--border` | `#E7DCCB` | `#2F3841` | |
-| `--primary` | `#B97A3E` Rust | `#D9A566` Ochre | the "x" |
-| `--secondary` | `#F3E9D7` Sand | `#26323D` Night | |
-| `--accent` | `#E8B04A` Brass | `#E8B04A` Brass | |
-| `--ring` / links hover | `#8A5528` Umber | `#D9A566` Ochre | |
-| `--terminal` (custom) | `#7FD67A` Phosphor on `#1E2A22` | same | code blocks, `$` prompts |
+| Token                  | Light                           | Dark            | Logo name                |
+| ---------------------- | ------------------------------- | --------------- | ------------------------ |
+| `--background`         | `#FBF7F0`                       | `#161B20`       | page bg                  |
+| `--card`               | `#FFFFFF`                       | `#1E252C`       | surface                  |
+| `--foreground`         | `#2B2B2B` Charcoal              | `#F3E9D7` Sand  |                          |
+| `--muted-foreground`   | `#7A6A57`                       | `#B6A891`       |                          |
+| `--border`             | `#E7DCCB`                       | `#2F3841`       |                          |
+| `--primary`            | `#B97A3E` Rust                  | `#D9A566` Ochre | the "x"                  |
+| `--secondary`          | `#F3E9D7` Sand                  | `#26323D` Night |                          |
+| `--accent`             | `#E8B04A` Brass                 | `#E8B04A` Brass |                          |
+| `--ring` / links hover | `#8A5528` Umber                 | `#D9A566` Ochre |                          |
+| `--terminal` (custom)  | `#7FD67A` Phosphor on `#1E2A22` | same            | code blocks, `$` prompts |
 
 Typography: headings in Space Grotesk 700 with tight tracking. Body in IBM Plex Sans at around 18px with a 68ch measure. Dates, tags and code in Plex Mono, using the logo tagline's letter-spacing (0.12em) for small labels.
 
 Optional signature details, all in the spirit of the logo:
+
 - Faint "strata" wave dividers between sections, using the logo's three soil paths.
 - Code blocks styled as the CRT screen: dark green-black with a phosphor prompt.
 - Dark mode is "digging by night", matching the logo's dark variant.
@@ -49,6 +50,7 @@ Take these from the artifact's "copy svg" buttons and add them to `static/brand/
 - Generated from the icon: `favicon.svg` (with a `prefers-color-scheme` switch inside), `favicon.ico` at 32px, `apple-touch-icon.png` at 180px, and a 1200×630 `og-default.png`
 
 Two things to fix during import:
+
 1. **The wordmark is live `<text>`.** In an `<img>` or favicon the web fonts don't load, so it falls back to Arial. Either convert the text to outlines (Inkscape → Object to Path, or `svgo` plus a font-to-path step), or render the icon as SVG and set "te**x**cavator" as real HTML text beside it. The second option is sharper and more accessible, so I recommend it.
 2. **The `logo-auto` SVG follows only the OS colour scheme.** The site will have a manual theme toggle (shadcn's `mode-watcher`), so a `<Logo>` component should pick light or dark from the `.dark` class instead.
 
@@ -71,16 +73,18 @@ Two things to fix during import:
 
 Every post belongs to exactly one **section**, a recurring series with its own name, intro, colour and small glyph. Tags still cut across sections.
 
-| Section | Slug | What goes in it | Shortlist topics that fit |
-|---|---|---|---|
-| **FOSSils** | `/fossils` | Origin stories and lineages of open-source projects: who started them, what they grew out of, what died along the way. | curses ← Rogue, ncurses and Thomas Dickey, Krustlet → SpinKube, GFS → Hadoop → Spark, Docker at dotCloud, chroot → namespaces → bubblewrap, GNU screen → CBOR |
-| **eTTYmology** | `/ettymology` | Where a name, word, path or key binding comes from. Short pieces, often under 800 words. | Why `/usr` exists, Ping and sonar, Hadoop's toy elephant, Kubernetes and "Seven of Nine", Ctrl-S and XON/XOFF, ¥ as the path separator, termcap/terminfo |
+| Section           | Slug             | What goes in it                                                                                                                                                  | Shortlist topics that fit                                                                                                                                     |
+| ----------------- | ---------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **FOSSils**       | `/fossils`       | Origin stories and lineages of open-source projects: who started them, what they grew out of, what died along the way.                                           | curses ← Rogue, ncurses and Thomas Dickey, Krustlet → SpinKube, GFS → Hadoop → Spark, Docker at dotCloud, chroot → namespaces → bubblewrap, GNU screen → CBOR |
+| **eTTYmology**    | `/ettymology`    | Where a name, word, path or key binding comes from. Short pieces, often under 800 words.                                                                         | Why `/usr` exists, Ping and sonar, Hadoop's toy elephant, Kubernetes and "Seven of Nine", Ctrl-S and XON/XOFF, ¥ as the path separator, termcap/terminfo      |
 | **Bugs in Amber** | `/bugs-in-amber` | Famous bugs, glitches and hacks, preserved: bugs kept on purpose for compatibility, glitches people exploited, and the post-mortems of the ones that got caught. | SimCity and Windows 95, Excel's 1900 leap year, AARD code, MissingNo, Mario 64 upwarp, NES Tetris crash, the Confused Deputy, the xz backdoor, Trusting Trust |
 
 Possible further section, only if the material keeps piling up:
+
 - **Dig Site**: long reads and multi-part series (capability OSes in two parts).
 
 Implementation:
+
 - `src/lib/sections.ts` is the single source of truth: `{ slug, name, tagline, description, accent, glyph }[]`. The zod schema checks `section` against it, so adding a section is one entry plus a folder.
 - Posts live in `src/content/<section>/<slug>.md`. The URL is `/<section>/<slug>`, rendered by `src/routes/[section]/[slug]`, with `entries()` listing every pair for prerendering.
 - **Wordmark styling:** the names are puns on embedded capitals, the way the logo highlights the "x". Render them with the pun letters in the accent colour: **FOSS**ils, e**TTY**mology and Bugs in **Amber**. A `SectionName.svelte` component handles this so it looks the same in nav, badges and headings.
@@ -95,17 +99,17 @@ Posts live in `src/content/<section>/<slug>.md`:
 
 ```md
 ---
-title: "curses was pulled out of Rogue"
+title: 'curses was pulled out of Rogue'
 date: 2026-10-20
-summary: "Ken Arnold needed Rogue to draw a dungeon on any terminal. The library outlived the game."
-section: fossils       # fossils | ettymology | bugs-in-amber (see §4b)
+summary: 'Ken Arnold needed Rogue to draw a dungeon on any terminal. The library outlived the game.'
+section: fossils # fossils | ettymology | bugs-in-amber (see §4b)
 tags: [unix, terminals, games]
-era: 1980              # optional, for a later timeline view
-cover: ./cover.png     # optional
+era: 1980 # optional, for a later timeline view
+cover: ./cover.png # optional
 draft: false
 sources:
-  - title: "..."
-    url: "..."
+  - title: '...'
+    url: '...'
 ---
 ```
 
@@ -119,6 +123,7 @@ sources:
 From shadcn-svelte: `button`, `badge`, `card`, `separator`, `sheet`, `tooltip`, `toggle`.
 
 Custom components in `src/lib/components/`:
+
 - `Logo.svelte`: the theme-aware icon plus the HTML wordmark
 - `SiteHeader.svelte` / `SiteFooter.svelte`: the footer carries the tagline and RSS link
 - `ThemeToggle.svelte`: uses `mode-watcher`, with a sun/moon icon matching the logo's day and night
@@ -190,3 +195,16 @@ texcavator/
 
 - Comments: none, or Giscus (GitHub Discussions)?
 - Language: English only?
+
+## Implementation notes (deviations from the plan above)
+
+Milestones 1–4 are built; deployment (milestone 5) needs the Cloudflare Pages project and domain set up in the dashboard.
+
+- **SvelteKit 3.** The scaffold is Kit 3, which configures Kit inside `vite.config.ts` and uses `#lib/*` subpath imports instead of `$lib`. Imports therefore need explicit extensions (`#lib/utils.ts`, `#lib/components/ui/button/index.ts`).
+- **shadcn components are hand-written.** The shadcn-svelte registry host is blocked by this environment's egress policy, so `Button`, `Badge`, `Card` and `Separator` were written in shadcn's style (same `tailwind-variants` + `cn()` pattern). `Sheet`, `Tooltip` and `Toggle` are not included: the mobile nav simply wraps, and the theme toggle is a plain `Button`. `components.json` is in place, so `npx shadcn-svelte add <component>` works wherever the registry is reachable.
+- **Light-mode primary is Umber (`#8a5528`), not Rust.** Rust on the cream background fails WCAG AA for text, so Rust stays a logo and decoration colour. All token pairs were checked (4.5:1 or better). Section accents use text-safe variants: Umber (FOSSils), a darker green (eTTYmology) and `#96560f` (Bugs in Amber) in light mode, with Ochre, Phosphor and a brighter amber in dark mode.
+- **Code blocks use one dark Shiki theme** (`vitesse-dark`) on the CRT background in both colour modes, instead of two themes.
+- **Post parsing is server-only.** `src/lib/server/posts.ts` (zod, globbing, sorting) runs only in `+page.server.ts` loads at build time. The post page lazily imports just its own Markdown component, so no post index or zod ships to the browser.
+- **Footnotes are deferred;** each post ends with its Sources list instead.
+- **The wordmark is HTML text** next to the icon SVGs (see section 3). Raster assets (`apple-touch-icon.png`, `favicon.ico`, `og-default.png`) were rendered from the logo SVGs.
+- **The three seed posts are short drafts** from the topic shortlist and carry a visible "Draft" note. Their facts and attributions still need checking against the listed sources before launch.
