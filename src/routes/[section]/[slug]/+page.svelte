@@ -53,7 +53,8 @@
 
 	{#if post.tags.length}
 		<p class="mt-8 flex flex-wrap gap-2">
-			{#each post.tags as tag (tag)}<Badge href={resolve('/tags/[tag]', { tag })}>{tag}</Badge
+			{#each post.tags as tag (tag)}<Badge variant="outline" href={resolve('/tags/[tag]', { tag })}
+					>{tag}</Badge
 				>{/each}
 		</p>
 	{/if}

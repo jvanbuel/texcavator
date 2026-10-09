@@ -22,7 +22,7 @@
 </script>
 
 {#if parts}
-	<span class="font-display font-bold tracking-tight">
+	<span class="font-heading font-bold tracking-tight">
 		{parts.before}<span class={colour[slug]}>{parts.mid}</span>{parts.after}
 	</span>
 {/if}

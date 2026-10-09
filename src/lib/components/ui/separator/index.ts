@@ -1,2 +1,7 @@
-import Separator from './separator.svelte';
-export { Separator };
+import Root from './separator.svelte';
+
+export {
+	Root,
+	//
+	Root as Separator
+};

@@ -24,7 +24,7 @@
 		class="hidden dark:block"
 	/>
 	{#if wordmark}
-		<span class="font-display text-2xl leading-none font-bold tracking-tight">
+		<span class="font-heading text-2xl leading-none font-bold tracking-tight">
 			te<span class="text-primary">x</span>cavator
 		</span>
 	{:else}

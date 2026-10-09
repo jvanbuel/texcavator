@@ -2,6 +2,7 @@
 	import './layout.css';
 	import { ModeWatcher } from 'mode-watcher';
 	import SiteHeader from '#lib/components/SiteHeader.svelte';
+	import * as Tooltip from '#lib/components/ui/tooltip/index.ts';
 	import SiteFooter from '#lib/components/SiteFooter.svelte';
 	import { site } from '#lib/site.ts';
 	import type { LayoutProps } from './$types';
@@ -17,10 +18,12 @@
 </svelte:head>
 
 <ModeWatcher />
-<div class="flex min-h-screen flex-col">
-	<SiteHeader />
-	<main id="main" class="mx-auto w-full max-w-5xl flex-1 px-5 py-10">
-		{@render children()}
-	</main>
-	<SiteFooter />
-</div>
+<Tooltip.Provider>
+	<div class="flex min-h-screen flex-col">
+		<SiteHeader />
+		<main id="main" class="mx-auto w-full max-w-5xl flex-1 px-5 py-10">
+			{@render children()}
+		</main>
+		<SiteFooter />
+	</div>
+</Tooltip.Provider>

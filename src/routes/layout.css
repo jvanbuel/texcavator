@@ -1,16 +1,17 @@
 @import 'tailwindcss';
 @plugin '@tailwindcss/typography';
 
-@import '@fontsource/space-grotesk/700.css';
-@import '@fontsource/ibm-plex-sans/400.css';
-@import '@fontsource/ibm-plex-sans/400-italic.css';
-@import '@fontsource/ibm-plex-sans/600.css';
 @import '@fontsource/ibm-plex-mono/400.css';
 @import '@fontsource/ibm-plex-mono/500.css';
+@import 'tw-animate-css';
+@import 'shadcn-svelte/tailwind.css';
+@import '@fontsource-variable/ibm-plex-sans';
+@import '@fontsource-variable/ibm-plex-sans/wght-italic.css';
+@import '@fontsource-variable/space-grotesk';
 
 @custom-variant dark (&:is(.dark *));
 
-/* Tokens come from the Texcavator logo palette (see PLAN.md §2). */
+/* Colours come from the Texcavator logo palette (see PLAN.md §2); structure and extra tokens from shadcn-svelte. */
 :root {
 	--background: #fbf7f0;
 	--foreground: #2b2b2b;
@@ -19,13 +20,13 @@
 	--muted: #f3e9d7;
 	--muted-foreground: #6b5b48;
 	--border: #e7dccb;
-	--primary: #8a5528; /* Umber: AA for text and links on the cream background */
+	--primary: #8a5528;
 	--primary-foreground: #fbf7f0;
 	--secondary: #f3e9d7;
 	--secondary-foreground: #2b2b2b;
-	--accent: #e8b04a; /* Brass */
+	--accent: #f3e9d7;
 	--accent-foreground: #2b2b2b;
-	--ring: #b97a3e; /* Rust */
+	--ring: #b97a3e;
 
 	/* Section accents (text-safe variants) */
 	--section-fossils: #8a5528;
@@ -36,6 +37,25 @@
 	--terminal: #1e2a22;
 	--terminal-foreground: #d7e8d4;
 	--phosphor: #7fd67a;
+	--brass: #e8b04a; /* trowel handle: blockquote rules */
+	--popover: #ffffff;
+	--popover-foreground: #2b2b2b;
+	--destructive: oklch(0.577 0.245 27.325);
+	--input: #e7dccb;
+	--chart-1: oklch(0.87 0 0);
+	--chart-2: oklch(0.556 0 0);
+	--chart-3: oklch(0.439 0 0);
+	--chart-4: oklch(0.371 0 0);
+	--chart-5: oklch(0.269 0 0);
+	--radius: 0.625rem;
+	--sidebar: oklch(0.985 0 0);
+	--sidebar-foreground: oklch(0.145 0 0);
+	--sidebar-primary: oklch(0.205 0 0);
+	--sidebar-primary-foreground: oklch(0.985 0 0);
+	--sidebar-accent: oklch(0.97 0 0);
+	--sidebar-accent-foreground: oklch(0.205 0 0);
+	--sidebar-border: oklch(0.922 0 0);
+	--sidebar-ring: oklch(0.708 0 0);
 }
 
 .dark {
@@ -46,17 +66,34 @@
 	--muted: #26323d;
 	--muted-foreground: #b6a891;
 	--border: #2f3841;
-	--primary: #d9a566; /* Ochre */
+	--primary: #d9a566;
 	--primary-foreground: #161b20;
 	--secondary: #26323d;
 	--secondary-foreground: #f3e9d7;
-	--accent: #e8b04a;
-	--accent-foreground: #161b20;
+	--accent: #26323d;
+	--accent-foreground: #f3e9d7;
 	--ring: #d9a566;
 
 	--section-fossils: #d9a566;
 	--section-ettymology: #7fd67a;
 	--section-amber: #e8a23a;
+	--popover: #1e252c;
+	--popover-foreground: #f3e9d7;
+	--destructive: oklch(0.704 0.191 22.216);
+	--input: #2f3841;
+	--chart-1: oklch(0.87 0 0);
+	--chart-2: oklch(0.556 0 0);
+	--chart-3: oklch(0.439 0 0);
+	--chart-4: oklch(0.371 0 0);
+	--chart-5: oklch(0.269 0 0);
+	--sidebar: oklch(0.205 0 0);
+	--sidebar-foreground: oklch(0.985 0 0);
+	--sidebar-primary: oklch(0.488 0.243 264.376);
+	--sidebar-primary-foreground: oklch(0.985 0 0);
+	--sidebar-accent: oklch(0.269 0 0);
+	--sidebar-accent-foreground: oklch(0.985 0 0);
+	--sidebar-border: oklch(1 0 0 / 10%);
+	--sidebar-ring: oklch(0.556 0 0);
 }
 
 @theme inline {
@@ -77,21 +114,47 @@
 	--color-terminal: var(--terminal);
 	--color-terminal-foreground: var(--terminal-foreground);
 	--color-phosphor: var(--phosphor);
+	--color-brass: var(--brass);
 	--color-fossils: var(--section-fossils);
 	--color-ettymology: var(--section-ettymology);
 	--color-amber: var(--section-amber);
 
-	--font-sans: 'IBM Plex Sans', 'Helvetica Neue', Arial, sans-serif;
+	--font-sans: 'IBM Plex Sans Variable', 'Helvetica Neue', Arial, sans-serif;
 	--font-mono: 'IBM Plex Mono', 'Courier New', monospace;
-	--font-display: 'Space Grotesk', 'Helvetica Neue', Arial, sans-serif;
+	--font-heading: 'Space Grotesk Variable', 'Helvetica Neue', Arial, sans-serif;
+	--color-sidebar-ring: var(--sidebar-ring);
+	--color-sidebar-border: var(--sidebar-border);
+	--color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+	--color-sidebar-accent: var(--sidebar-accent);
+	--color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+	--color-sidebar-primary: var(--sidebar-primary);
+	--color-sidebar-foreground: var(--sidebar-foreground);
+	--color-sidebar: var(--sidebar);
+	--color-chart-5: var(--chart-5);
+	--color-chart-4: var(--chart-4);
+	--color-chart-3: var(--chart-3);
+	--color-chart-2: var(--chart-2);
+	--color-chart-1: var(--chart-1);
+	--color-input: var(--input);
+	--color-destructive: var(--destructive);
+	--color-popover-foreground: var(--popover-foreground);
+	--color-popover: var(--popover);
+	--radius-sm: calc(var(--radius) * 0.6);
+	--radius-md: calc(var(--radius) * 0.8);
+	--radius-lg: var(--radius);
+	--radius-xl: calc(var(--radius) * 1.4);
+	--radius-2xl: calc(var(--radius) * 1.8);
+	--radius-3xl: calc(var(--radius) * 2.2);
+	--radius-4xl: calc(var(--radius) * 2.6);
 }
 
 @layer base {
 	* {
-		@apply border-border;
+		@apply border-border outline-ring/50;
 	}
 	html {
 		color-scheme: light;
+		@apply font-sans;
 	}
 	html.dark {
 		color-scheme: dark;
@@ -103,7 +166,7 @@
 	h2,
 	h3,
 	h4 {
-		@apply font-display font-bold tracking-tight;
+		@apply font-heading font-bold tracking-tight;
 	}
 	:focus-visible {
 		@apply outline-2 outline-offset-2 outline-ring;
@@ -132,7 +195,7 @@
 	--tw-prose-bullets: var(--muted-foreground);
 	--tw-prose-hr: var(--border);
 	--tw-prose-quotes: var(--foreground);
-	--tw-prose-quote-borders: var(--accent);
+	--tw-prose-quote-borders: var(--brass);
 	--tw-prose-captions: var(--muted-foreground);
 	--tw-prose-code: var(--foreground);
 	--tw-prose-pre-code: var(--terminal-foreground);
@@ -143,7 +206,7 @@
 	max-width: 68ch;
 }
 .prose :where(h1, h2, h3, h4) {
-	font-family: var(--font-display);
+	font-family: var(--font-heading);
 	letter-spacing: -0.01em;
 }
 .prose :where(a):hover {

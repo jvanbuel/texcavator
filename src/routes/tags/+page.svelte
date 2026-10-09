@@ -11,6 +11,8 @@
 <h1 class="mb-8 text-4xl">Tags</h1>
 <p class="flex flex-wrap gap-3">
 	{#each data.tags as { tag, count } (tag)}
-		<Badge href={resolve('/tags/[tag]', { tag })} class="text-sm">{tag} · {count}</Badge>
+		<Badge variant="outline" href={resolve('/tags/[tag]', { tag })} class="text-sm"
+			>{tag} · {count}</Badge
+		>
 	{/each}
 </p>
