@@ -4,31 +4,33 @@
 
 	let { class: className }: { class?: string } = $props();
 
-	// The terminal's face blinks: "> -" becomes "- -" for a moment, once on load and on hover.
-	let closed = $state(false);
-	let timer: ReturnType<typeof setTimeout> | undefined;
-
-	function blink() {
-		if (closed || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-		closed = true;
-		timer = setTimeout(() => (closed = false), 160);
-	}
+	// The terminal's face squints: "> -" becomes "> <". Once briefly after load, and for as long
+	// as the pointer rests on the badge. The load squint is skipped when motion is reduced.
+	let hovering = $state(false);
+	let flash = $state(false);
+	const squint = $derived(hovering || flash);
 
 	onMount(() => {
-		const first = setTimeout(blink, 900);
+		if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+		let end: ReturnType<typeof setTimeout> | undefined;
+		const start = setTimeout(() => {
+			flash = true;
+			end = setTimeout(() => (flash = false), 300);
+		}, 900);
 		return () => {
-			clearTimeout(first);
-			clearTimeout(timer);
+			clearTimeout(start);
+			clearTimeout(end);
 		};
 	});
 </script>
 
 <!--
-	The logo badge, inlined so the terminal's face can blink. Generated from
+	The logo badge, inlined so the terminal's face can squint. Generated from
 	static/brand/texcavator-icon-{light,dark}.svg; keep them in sync. Decorative.
 -->
 <svg
-	onpointerenter={blink}
+	onpointerenter={() => (hovering = true)}
+	onpointerleave={() => (hovering = false)}
 	viewBox="8 8 184 184"
 	aria-hidden="true"
 	focusable="false"
@@ -58,16 +60,23 @@
 				stroke-width="3.5"
 				stroke-linecap="round"
 				stroke-linejoin="round"
-				opacity={closed ? 0 : 1}
 			/><rect
-				x="-23"
+				x="-7"
 				y="-3"
-				width="12"
+				width="14"
 				height="4"
 				rx="1"
 				fill="#7FD67A"
-				opacity={closed ? 1 : 0}
-			/><rect x="-7" y="-3" width="14" height="4" rx="1" fill="#7FD67A" />
+				opacity={squint ? 0 : 1}
+			/><path
+				d="M8 -14 L-1 -7 L8 0"
+				fill="none"
+				stroke="#7FD67A"
+				stroke-width="3.5"
+				stroke-linecap="round"
+				stroke-linejoin="round"
+				opacity={squint ? 1 : 0}
+			/>
 			<circle cx="30" cy="22" r="2.5" fill="#B97A3E" /></g
 		>
 		<path d="M0 136 Q55 128 105 136 T200 132 V200 H0Z" fill="#B97A3E" />
@@ -102,7 +111,8 @@
 	<circle cx="100" cy="100" r="84" fill="none" stroke="#2B2B2B" stroke-width="6" />
 </svg>
 <svg
-	onpointerenter={blink}
+	onpointerenter={() => (hovering = true)}
+	onpointerleave={() => (hovering = false)}
 	viewBox="8 8 184 184"
 	aria-hidden="true"
 	focusable="false"
@@ -152,16 +162,23 @@
 				stroke-width="3.5"
 				stroke-linecap="round"
 				stroke-linejoin="round"
-				opacity={closed ? 0 : 1}
 			/><rect
-				x="-23"
+				x="-7"
 				y="-3"
-				width="12"
+				width="14"
 				height="4"
 				rx="1"
 				fill="#7FD67A"
-				opacity={closed ? 1 : 0}
-			/><rect x="-7" y="-3" width="14" height="4" rx="1" fill="#7FD67A" />
+				opacity={squint ? 0 : 1}
+			/><path
+				d="M8 -14 L-1 -7 L8 0"
+				fill="none"
+				stroke="#7FD67A"
+				stroke-width="3.5"
+				stroke-linecap="round"
+				stroke-linejoin="round"
+				opacity={squint ? 1 : 0}
+			/>
 			<circle cx="30" cy="22" r="2.5" fill="#B97A3E" /></g
 		>
 		<path d="M0 136 Q55 128 105 136 T200 132 V200 H0Z" fill="#B97A3E" />
