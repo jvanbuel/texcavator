@@ -1,14 +1,34 @@
 <script lang="ts">
+	import { onMount } from 'svelte';
 	import { cn } from '#lib/utils.js';
 
 	let { class: className }: { class?: string } = $props();
+
+	// The terminal's face blinks: "> -" becomes "- -" for a moment, once on load and on hover.
+	let closed = $state(false);
+	let timer: ReturnType<typeof setTimeout> | undefined;
+
+	function blink() {
+		if (closed || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+		closed = true;
+		timer = setTimeout(() => (closed = false), 160);
+	}
+
+	onMount(() => {
+		const first = setTimeout(blink, 900);
+		return () => {
+			clearTimeout(first);
+			clearTimeout(timer);
+		};
+	});
 </script>
 
 <!--
-	The logo badge, inlined so the terminal's cursor can blink. Generated from
+	The logo badge, inlined so the terminal's face can blink. Generated from
 	static/brand/texcavator-icon-{light,dark}.svg; keep them in sync. Decorative.
 -->
 <svg
+	onpointerenter={blink}
 	viewBox="8 8 184 184"
 	aria-hidden="true"
 	focusable="false"
@@ -38,7 +58,16 @@
 				stroke-width="3.5"
 				stroke-linecap="round"
 				stroke-linejoin="round"
-			/><rect class="cursor" x="-7" y="-3" width="14" height="4" rx="1" fill="#7FD67A" />
+				opacity={closed ? 0 : 1}
+			/><rect
+				x="-23"
+				y="-3"
+				width="12"
+				height="4"
+				rx="1"
+				fill="#7FD67A"
+				opacity={closed ? 1 : 0}
+			/><rect x="-7" y="-3" width="14" height="4" rx="1" fill="#7FD67A" />
 			<circle cx="30" cy="22" r="2.5" fill="#B97A3E" /></g
 		>
 		<path d="M0 136 Q55 128 105 136 T200 132 V200 H0Z" fill="#B97A3E" />
@@ -73,6 +102,7 @@
 	<circle cx="100" cy="100" r="84" fill="none" stroke="#2B2B2B" stroke-width="6" />
 </svg>
 <svg
+	onpointerenter={blink}
 	viewBox="8 8 184 184"
 	aria-hidden="true"
 	focusable="false"
@@ -122,7 +152,16 @@
 				stroke-width="3.5"
 				stroke-linecap="round"
 				stroke-linejoin="round"
-			/><rect class="cursor" x="-7" y="-3" width="14" height="4" rx="1" fill="#7FD67A" />
+				opacity={closed ? 0 : 1}
+			/><rect
+				x="-23"
+				y="-3"
+				width="12"
+				height="4"
+				rx="1"
+				fill="#7FD67A"
+				opacity={closed ? 1 : 0}
+			/><rect x="-7" y="-3" width="14" height="4" rx="1" fill="#7FD67A" />
 			<circle cx="30" cy="22" r="2.5" fill="#B97A3E" /></g
 		>
 		<path d="M0 136 Q55 128 105 136 T200 132 V200 H0Z" fill="#B97A3E" />
@@ -150,17 +189,3 @@
 	>
 	<circle cx="100" cy="100" r="84" fill="none" stroke="#F3E9D7" stroke-width="6" />
 </svg>
-
-<style>
-	/* A terminal cursor: on, then off, with no fade. Stays lit when motion is reduced. */
-	@media (prefers-reduced-motion: no-preference) {
-		.cursor {
-			animation: blink 1.1s steps(1, end) infinite;
-		}
-	}
-	@keyframes blink {
-		50% {
-			opacity: 0;
-		}
-	}
-</style>
