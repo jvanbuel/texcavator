@@ -45,9 +45,14 @@ The seed posts in `src/content/` show each one in use. Invalid or missing fields
 
 Tags get an icon from `src/lib/tag-icons.ts` (brand logos via Simple Icons, concepts via Lucide). Add a line there for new tags; unmapped tags fall back to a generic tag glyph.
 
-## Deploy (Cloudflare Pages)
+## Deploy (Cloudflare Workers, static assets)
 
-Create a Pages project from this repo with build command `pnpm build` and output directory `build`, then add `texcavator.dev` as a custom domain. `static/_headers` and `static/_redirects` are picked up automatically. GitHub Actions (`.github/workflows/check.yml`) only runs checks.
+The site is a Cloudflare Workers project serving the static `build/` folder; `wrangler.jsonc` configures it (no Worker script). Cloudflare's Git integration runs:
+
+- Build command: `pnpm run build`
+- Deploy command: `npx wrangler deploy`
+
+`static/_headers` sets the security and caching headers, and `build/404.html` is served for unknown paths. Add `texcavator.dev` under the Worker's **Settings → Domains & Routes**. A www → bare-domain redirect is a dashboard **Redirect Rule**, not a `_redirects` line (Cloudflare doesn't support domain-level redirects there). To test production routing locally: `pnpm build && pnpm exec wrangler dev`. GitHub Actions (`.github/workflows/check.yml`) only runs checks.
 
 ## Brand
 

@@ -39,7 +39,8 @@ export default defineConfig({
 				runes: ({ filename }) =>
 					filename.split(/[/\\]/).includes('node_modules') ? undefined : true
 			},
-			adapter: adapter(),
+			// 404.html: the site's error page, served by Cloudflare for unknown paths.
+			adapter: adapter({ fallback: '404.html' }),
 			preprocess: [
 				mdsvex({
 					extensions: ['.svx', '.md'],
