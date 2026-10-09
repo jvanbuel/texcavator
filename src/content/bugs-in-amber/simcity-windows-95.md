@@ -3,6 +3,20 @@ title: 'SimCity and Windows 95'
 date: 2026-10-16
 summary: 'SimCity read memory right after freeing it. Windows 95 noticed, and switched allocators just for that game.'
 section: bugs-in-amber
+bugId: '1995-SIMCITY'
+resolution: WONTFIX
+resolutionNote: worked around in the OS
+bugClass: Use after free
+component: Windows 95 heap allocator
+severity: Crash
+preserved: Yes, in the OS
+history:
+  - when: early 90s
+    what: SimCity reads memory right after freeing it. On Windows 3.x the freed memory is still intact, so nobody notices.
+  - when: '1995'
+    what: Windows 95's stricter allocator hands the memory out again, and SimCity crashes.
+  - when: '1995'
+    what: Windows learns to recognise SimCity and switches to an allocator that tolerates the bug.
 tags: [windows, compatibility]
 era: 1995
 sources:

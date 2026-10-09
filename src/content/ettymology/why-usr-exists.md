@@ -3,6 +3,20 @@ title: 'Why /usr exists'
 date: 2026-10-18
 summary: 'The first Unix disk on the PDP-11 filled up, so the system spilled onto a second one. That is where /bin and /usr/bin come from.'
 section: ettymology
+term: '/usr'
+whatis: 'the second disk that became half of Unix'
+manSection: 7
+synopsis: '/bin  /usr/bin  /usr/lib  /usr/share'
+from:
+  - '"user"'
+  - 'home directories on disk two'
+  - 'programs spill over'
+  - '/usr today'
+seeAlso:
+  - title: 'hier(7)'
+    url: 'https://man7.org/linux/man-pages/man7/hier.7.html'
+  - title: 'The /usr merge'
+    url: 'https://www.freedesktop.org/wiki/Software/systemd/TheCaseForTheUsrMerge/'
 tags: [unix, filesystems]
 era: 1971
 sources:

@@ -33,7 +33,15 @@ sources:
 ---
 ```
 
-Invalid frontmatter fails the build with the file name and the offending field.
+Each section adds its own fields, which shape the post header:
+
+| Section         | Required                                                                                 | Optional                                                                      | Header                                                                           |
+| --------------- | ---------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------- | -------------------------------------------------------------------------------- |
+| `ettymology`    | `term`, `whatis`, `from` (2+ steps, oldest first)                                        | `manSection` (default 7), `synopsis`, `seeAlso`                               | a man page                                                                       |
+| `fossils`       | `era` (year), `status` (`extant`, `fossilised`, `extinct`)                               | `lineage` (oldest first; mark this post's project `self: true`)               | status chip and lineage strata; the FOSSils tab places posts in the dig by `era` |
+| `bugs-in-amber` | `bugId`, `resolution` (`WONTFIX`, `BY DESIGN`, `EXPLOITED`, `CANNOT REPRODUCE`, `FIXED`) | `resolutionNote`, `bugClass`, `component`, `severity`, `preserved`, `history` | a bug ticket with its history                                                    |
+
+The seed posts in `src/content/` show each one in use. Invalid or missing fields fail the build with the file name and the offending field.
 
 Tags get an icon from `src/lib/tag-icons.ts` (brand logos via Simple Icons, concepts via Lucide). Add a line there for new tags; unmapped tags fall back to a generic tag glyph.
 

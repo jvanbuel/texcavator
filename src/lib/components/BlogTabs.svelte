@@ -1,14 +1,16 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
-	import type { Post } from '#lib/server/posts.ts';
+	import type { Post, PostOf } from '#lib/server/posts.ts';
 	import { sections, type SectionSlug } from '#lib/sections.ts';
 	import * as Tabs from '#lib/components/ui/tabs/index.ts';
+	import Dig from './Dig.svelte';
 	import PostCard from './PostCard.svelte';
 	import SectionName from './SectionName.svelte';
 
 	let { active, posts }: { active: 'all' | SectionSlug; posts: Post[] } = $props();
 
 	const section = $derived(sections.find((s) => s.slug === active));
+	const fossils = $derived(posts.filter((p): p is PostOf<'fossils'> => p.section === 'fossils'));
 </script>
 
 <!-- Each tab is a real link to a prerendered page, so every section keeps its own URL and RSS feed. -->
@@ -45,12 +47,16 @@
 				<p class="text-lg text-muted-foreground">Everything dug up so far, newest first.</p>
 			{/if}
 		</header>
-		<div class="grid gap-4 sm:grid-cols-2">
-			{#each posts as post (post.section + post.slug)}
-				<PostCard {post} showSection={!section} />
-			{:else}
-				<p class="text-muted-foreground">Nothing dug up here yet.</p>
-			{/each}
-		</div>
+		{#if active === 'fossils' && fossils.length}
+			<Dig posts={fossils} />
+		{:else}
+			<div class="grid gap-4 sm:grid-cols-2">
+				{#each posts as post (post.section + post.slug)}
+					<PostCard {post} showSection={!section} />
+				{:else}
+					<p class="text-muted-foreground">Nothing dug up here yet.</p>
+				{/each}
+			</div>
+		{/if}
 	</Tabs.Content>
 </Tabs.Root>

@@ -4,6 +4,10 @@
 	import { Separator } from '#lib/components/ui/separator/index.ts';
 	import SectionName from '#lib/components/SectionName.svelte';
 	import Seo from '#lib/components/Seo.svelte';
+	import BugTicket from '#lib/components/headers/BugTicket.svelte';
+	import Lineage from '#lib/components/headers/Lineage.svelte';
+	import ManPage from '#lib/components/headers/ManPage.svelte';
+	import TicketHistory from '#lib/components/headers/TicketHistory.svelte';
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
@@ -20,7 +24,7 @@
 />
 
 <article>
-	<header class="mb-8 grid max-w-[68ch] gap-3">
+	<header class="mb-10 grid max-w-3xl gap-4">
 		<p class="label flex flex-wrap gap-x-3">
 			<a
 				href={resolve('/[section]', { section: post.section })}
@@ -31,8 +35,19 @@
 			<time datetime={post.dateIso}>{post.dateIso}</time>
 			<span>{post.readingMinutes} min read</span>
 		</p>
-		<h1 class="text-4xl sm:text-5xl">{post.title}</h1>
-		<p class="text-xl text-muted-foreground">{post.summary}</p>
+		{#if post.section === 'ettymology'}
+			<ManPage {post} />
+			<h1 class="mt-3 text-4xl sm:text-5xl">{post.title}</h1>
+			<p class="text-xl text-muted-foreground">{post.summary}</p>
+		{:else if post.section === 'fossils'}
+			<h1 class="text-4xl sm:text-5xl">{post.title}</h1>
+			<p class="text-xl text-muted-foreground">{post.summary}</p>
+			<div class="mt-3"><Lineage {post} /></div>
+		{:else}
+			<BugTicket {post} />
+			<p class="text-xl text-muted-foreground">{post.summary}</p>
+			<div class="mt-2"><TicketHistory {post} /></div>
+		{/if}
 	</header>
 
 	<div class="prose max-w-none">

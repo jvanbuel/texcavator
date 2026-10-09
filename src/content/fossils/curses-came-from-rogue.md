@@ -3,6 +3,22 @@ title: 'curses was pulled out of Rogue'
 date: 2026-10-20
 summary: 'Ken Arnold wrote curses so Rogue could draw its dungeon on any terminal. The library outlived the game.'
 section: fossils
+status: extant
+lineage:
+  - name: termcap
+    when: late 1970s
+    note: Bill Joy, for vi
+  - name: curses
+    when: c. 1980
+    self: true
+  - name: terminfo
+    when: 1980s
+    note: Mary Ann Horton, System V
+  - name: ncurses
+    when: 1990s
+    note: Thomas Dickey
+  - name: ratatui and other TUI libraries
+    when: 2020s
 tags: [unix, terminals, games]
 era: 1980
 sources:

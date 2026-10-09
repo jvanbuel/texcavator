@@ -1,18 +1,81 @@
 import { z } from 'zod';
-import { sectionSlugs, type SectionSlug } from '#lib/sections.ts';
+import type { SectionSlug } from '#lib/sections.ts';
 
 const source = z.object({ title: z.string(), url: z.url() });
 
-const frontmatter = z.object({
+const base = z.object({
 	title: z.string().min(1),
 	date: z.coerce.date(),
 	summary: z.string().min(1),
-	section: z.enum(sectionSlugs),
 	tags: z.array(z.string()).default([]),
 	era: z.number().int().optional(),
 	draft: z.boolean().default(false),
 	sources: z.array(source).default([])
 });
+
+/** eTTYmology posts open with a man page: the term, its manual section and where the name came from. */
+const ettymology = base.extend({
+	section: z.literal('ettymology'),
+	term: z.string().min(1),
+	/** The one-line description after the name, as in `whatis`. */
+	whatis: z.string().min(1),
+	manSection: z.number().int().min(1).max(9).default(7),
+	synopsis: z.string().optional(),
+	/** The name's history, oldest first: at least where it started and where it ended up. */
+	from: z.array(z.string()).min(2),
+	seeAlso: z.array(z.object({ title: z.string(), url: z.url().optional() })).default([])
+});
+
+/** FOSSils posts show the project's status and its lineage, and need an era to sit in the dig. */
+const fossils = base.extend({
+	section: z.literal('fossils'),
+	era: z.number().int(),
+	status: z.enum(['extant', 'fossilised', 'extinct']),
+	/** Oldest first. Mark the post's own project with `self: true`. */
+	lineage: z
+		.array(
+			z.object({
+				name: z.string(),
+				when: z.string(),
+				note: z.string().optional(),
+				self: z.boolean().default(false)
+			})
+		)
+		.default([])
+});
+
+export const resolutions = [
+	'WONTFIX',
+	'BY DESIGN',
+	'EXPLOITED',
+	'CANNOT REPRODUCE',
+	'FIXED'
+] as const;
+
+/** Bugs in Amber posts open as a bug ticket. */
+const bugsInAmber = base.extend({
+	section: z.literal('bugs-in-amber'),
+	bugId: z.string().min(1),
+	resolution: z.enum(resolutions),
+	resolutionNote: z.string().optional(),
+	bugClass: z.string().optional(),
+	component: z.string().optional(),
+	severity: z.string().optional(),
+	preserved: z.string().optional(),
+	/** Oldest first. */
+	history: z.array(z.object({ when: z.string(), what: z.string() })).default([])
+});
+
+const frontmatter = z.discriminatedUnion('section', [ettymology, fossils, bugsInAmber]);
+
+// Every section in sections.ts needs a schema above, and vice versa.
+type SchemaSection = z.infer<typeof frontmatter>['section'];
+const sectionsCovered: Record<SectionSlug, true> & Record<SchemaSection, true> = {
+	ettymology: true,
+	fossils: true,
+	'bugs-in-amber': true
+};
+void sectionsCovered;
 
 export type Post = z.infer<typeof frontmatter> & {
 	slug: string;
@@ -20,6 +83,8 @@ export type Post = z.infer<typeof frontmatter> & {
 	dateIso: string;
 	readingMinutes: number;
 };
+
+export type PostOf<S extends SectionSlug> = Extract<Post, { section: S }>;
 
 type Loaded = { metadata?: unknown };
 
