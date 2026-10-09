@@ -1,13 +1,15 @@
-import { getPosts } from '#lib/server/posts.ts';
-import { sections } from '#lib/sections.ts';
+import { getPosts, type PostOf } from '#lib/server/posts.ts';
+import type { SectionSlug } from '#lib/sections.ts';
 
 export async function load() {
 	const all = await getPosts();
+	const of = <S extends SectionSlug>(section: S) =>
+		all.filter((p): p is PostOf<S> => p.section === section).slice(0, 3);
 	return {
-		strips: sections.map((section) => ({
-			section,
-			posts: all.filter((p) => p.section === section.slug).slice(0, 3)
-		})),
-		latest: all.slice(0, 4)
+		latest: all[0] ?? null,
+		// Top to bottom of the dig: words near the surface, bugs preserved deepest.
+		ettymology: of('ettymology'),
+		fossils: of('fossils'),
+		bugs: of('bugs-in-amber')
 	};
 }

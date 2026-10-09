@@ -1,7 +1,8 @@
 <script lang="ts">
 	import { getSection } from '#lib/sections.ts';
 
-	let { slug }: { slug: string } = $props();
+	/** `highlight` overrides the accent colour, for names set on a coloured ground. */
+	let { slug, highlight }: { slug: string; highlight?: string } = $props();
 
 	const colour: Record<string, string> = {
 		fossils: 'text-fossils',
@@ -23,6 +24,6 @@
 
 {#if parts}
 	<span class="font-heading font-bold tracking-tight">
-		{parts.before}<span class={colour[slug]}>{parts.mid}</span>{parts.after}
+		{parts.before}<span class={highlight ?? colour[slug]}>{parts.mid}</span>{parts.after}
 	</span>
 {/if}
