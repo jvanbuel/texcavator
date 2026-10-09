@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
+	import LogoBadge from '#lib/components/LogoBadge.svelte';
 	import Seo from '#lib/components/Seo.svelte';
 	import SectionName from '#lib/components/SectionName.svelte';
 	import { Button } from '#lib/components/ui/button/index.ts';
@@ -52,19 +53,8 @@
 		</div>
 		<!-- The logo at full size, by day or by night. Decorative: the header already names the site. -->
 		<div class="-order-1 md:order-none">
-			<img
-				src="/brand/texcavator-icon-light.svg"
-				alt=""
-				width="280"
-				height="280"
-				class="block size-28 drop-shadow-[0_12px_24px_rgb(138_85_40_/_0.25)] sm:size-40 md:size-[17.5rem] dark:hidden"
-			/>
-			<img
-				src="/brand/texcavator-icon-dark.svg"
-				alt=""
-				width="280"
-				height="280"
-				class="hidden size-28 drop-shadow-[0_12px_24px_rgb(0_0_0_/_0.4)] sm:size-40 md:size-[17.5rem] dark:block"
+			<LogoBadge
+				class="size-28 drop-shadow-[0_12px_24px_rgb(138_85_40_/_0.25)] sm:size-40 md:size-[17.5rem] dark:drop-shadow-[0_12px_24px_rgb(0_0_0_/_0.4)]"
 			/>
 		</div>
 	</div>

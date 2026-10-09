@@ -2,12 +2,12 @@
 
 Print-ready vector logos, for merch and anything outside the website.
 
-| File | Use |
-| --- | --- |
-| `texcavator-logo-light.svg` | Full logo (badge, wordmark, tagline) for light backgrounds |
-| `texcavator-logo-dark.svg` | Full logo, night version, for dark backgrounds and dark garments |
-| `texcavator-icon-light.svg` | Round badge only, light |
-| `texcavator-icon-dark.svg` | Round badge only, night |
+| File                        | Use                                                              |
+| --------------------------- | ---------------------------------------------------------------- |
+| `texcavator-logo-light.svg` | Full logo (badge, wordmark, tagline) for light backgrounds       |
+| `texcavator-logo-dark.svg`  | Full logo, night version, for dark backgrounds and dark garments |
+| `texcavator-icon-light.svg` | Round badge only, light                                          |
+| `texcavator-icon-dark.svg`  | Round badge only, night                                          |
 
 All lettering is converted to outlines (Space Grotesk Bold and IBM Plex Mono, shaped with HarfBuzz), so the files need no fonts installed. Colours are sRGB hex from the logo palette:
 
