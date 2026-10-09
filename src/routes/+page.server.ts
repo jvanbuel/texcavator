@@ -7,9 +7,9 @@ export async function load() {
 		all.filter((p): p is PostOf<S> => p.section === section).slice(0, 3);
 	return {
 		latest: all[0] ?? null,
-		// Top to bottom of the dig: words near the surface, bugs preserved deepest.
+		// Top to bottom of the dig: words near the surface, bugs in amber below, fossils deepest.
 		ettymology: of('ettymology'),
-		fossils: of('fossils'),
-		bugs: of('bugs-in-amber')
+		bugs: of('bugs-in-amber'),
+		fossils: of('fossils')
 	};
 }
