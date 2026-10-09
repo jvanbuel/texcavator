@@ -75,18 +75,17 @@ Every post belongs to exactly one **section**, a recurring series with its own n
 |---|---|---|---|
 | **FOSSils** | `/fossils` | Origin stories and lineages of open-source projects: who started them, what they grew out of, what died along the way. | curses ← Rogue, ncurses and Thomas Dickey, Krustlet → SpinKube, GFS → Hadoop → Spark, Docker at dotCloud, chroot → namespaces → bubblewrap, GNU screen → CBOR |
 | **eTTYmology** | `/ettymology` | Where a name, word, path or key binding comes from. Short pieces, often under 800 words. | Why `/usr` exists, Ping and sonar, Hadoop's toy elephant, Kubernetes and "Seven of Nine", Ctrl-S and XON/XOFF, ¥ as the path separator, termcap/terminfo |
+| **Bugs in Amber** | `/bugs-in-amber` | Famous bugs, glitches and hacks, preserved: bugs kept on purpose for compatibility, glitches people exploited, and the post-mortems of the ones that got caught. | SimCity and Windows 95, Excel's 1900 leap year, AARD code, MissingNo, Mario 64 upwarp, NES Tetris crash, the Confused Deputy, the xz backdoor, Trusting Trust |
 
-Possible further sections, only if the material keeps piling up:
-- **Compat Layers**: deliberate bug-for-bug compatibility (SimCity and Windows 95, Excel's 1900 leap year, AARD code).
-- **Glitch Strata**: games and hardware pushed past their limits (MissingNo, Crash Bandicoot's paging, the Mario 64 upwarp, NES Tetris).
-- **Dig Site**: long reads and multi-part series (capability OSes in two parts, Trusting Trust and xz).
+Possible further section, only if the material keeps piling up:
+- **Dig Site**: long reads and multi-part series (capability OSes in two parts).
 
 Implementation:
 - `src/lib/sections.ts` is the single source of truth: `{ slug, name, tagline, description, accent, glyph }[]`. The zod schema checks `section` against it, so adding a section is one entry plus a folder.
 - Posts live in `src/content/<section>/<slug>.md`. The URL is `/<section>/<slug>`, rendered by `src/routes/[section]/[slug]`, with `entries()` listing every pair for prerendering.
-- **Wordmark styling:** the names are puns on embedded capitals, the way the logo highlights the "x". Render them with the pun letters in the accent colour: **FOSS**ils and e**TTY**mology. A `SectionName.svelte` component handles this so it looks the same in nav, badges and headings.
-- **Section accents** come from the logo palette, so the brand stays one family. FOSSils uses Rust (an earth layer, fitting the fossil theme). eTTYmology uses Phosphor-on-CRT (terminal green, fitting TTY).
-- **Glyphs:** a small fossil/ammonite and a blinking `▍` cursor, drawn as inline SVG in the logo's line weight.
+- **Wordmark styling:** the names are puns on embedded capitals, the way the logo highlights the "x". Render them with the pun letters in the accent colour: **FOSS**ils, e**TTY**mology and Bugs in **Amber**. A `SectionName.svelte` component handles this so it looks the same in nav, badges and headings.
+- **Section accents** come from the logo palette, so the brand stays one family. FOSSils uses Rust (an earth layer, fitting the fossil theme). eTTYmology uses Phosphor-on-CRT (terminal green, fitting TTY). Bugs in Amber gets a new `--amber` token (around `#D4892A`; it needs an AA check for text use, falling back to Umber for text and keeping amber for fills). The section header shows the bug "preserved" in a translucent amber drop.
+- **Glyphs:** a small fossil/ammonite, a blinking `▍` cursor, and a beetle in an amber drop, drawn as inline SVG in the logo's line weight.
 - Each section gets its own RSS feed (`/fossils/rss.xml`) next to the global one.
 - The home page shows one strip per section, with its name, one-line tagline and its 3 latest posts.
 
@@ -99,7 +98,7 @@ Posts live in `src/content/<section>/<slug>.md`:
 title: "curses was pulled out of Rogue"
 date: 2026-10-20
 summary: "Ken Arnold needed Rogue to draw a dungeon on any terminal. The library outlived the game."
-section: fossils       # fossils | ettymology | … (see §4b)
+section: fossils       # fossils | ettymology | bugs-in-amber (see §4b)
 tags: [unix, terminals, games]
 era: 1980              # optional, for a later timeline view
 cover: ./cover.png     # optional
@@ -137,7 +136,7 @@ texcavator/
 ├─ src/
 │  ├─ app.css                 # Tailwind v4 + tokens
 │  ├─ app.html
-│  ├─ content/<section>/*.md   # fossils/, ettymology/
+│  ├─ content/<section>/*.md   # fossils/, ettymology/, bugs-in-amber/
 │  ├─ lib/
 │  │  ├─ components/ui/…      # shadcn-svelte (generated)
 │  │  ├─ components/…         # custom
@@ -183,12 +182,11 @@ texcavator/
 1. **Scaffold**: `npx sv create` (minimal, TS, Tailwind, mdsvex, prettier, eslint), adapter-static, `shadcn-svelte init`, fonts.
 2. **Brand**: tokens in `app.css`, logo assets imported and fixed, `Logo`, header, footer, theme toggle, favicons.
 3. **Blog engine**: `sections.ts`, `posts.ts` with zod, section landings, post layout, tags, RSS (global + per section), sitemap, Shiki.
-4. **Content**: about page, one seed post per section (e.g. FOSSils: curses ← Rogue; eTTYmology: why `/usr` exists).
+4. **Content**: about page, one seed post per section (FOSSils: curses ← Rogue; eTTYmology: why `/usr` exists; Bugs in Amber: SimCity and Windows 95).
 5. **Ship**: Cloudflare Pages project, texcavator.dev domain, `_headers`/`_redirects`, OG tags, Lighthouse and a11y pass.
 6. **Later**: per-post OG images, a timeline view by `era`, search (Pagefind runs on static output), newsletter.
 
 ## Open questions
 
-- Are FOSSils and eTTYmology the only sections at launch, or are there others already named?
 - Comments: none, or Giscus (GitHub Discussions)?
 - Language: English only?
