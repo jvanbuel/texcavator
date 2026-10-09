@@ -22,5 +22,6 @@ jobs:
       - name: Check links in built site
         uses: lycheeverse/lychee-action@v2
         with:
-          args: --offline --no-progress --root-dir "$(pwd)/build" 'build/**/*.html'
+          # Pages link to clean URLs (/about) that Cloudflare serves from about.html.
+          args: --offline --no-progress --root-dir "$(pwd)/build" --fallback-extensions html 'build/**/*.html'
           fail: true
