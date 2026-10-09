@@ -1,3 +1,5 @@
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import { z } from 'zod';
 import type { SectionSlug } from '#lib/sections.ts';
 
@@ -89,11 +91,6 @@ export type PostOf<S extends SectionSlug> = Extract<Post, { section: S }>;
 type Loaded = { metadata?: unknown };
 
 const files = import.meta.glob<Loaded>('/src/content/*/*.md');
-const rawFiles = import.meta.glob<string>('/src/content/*/*.md', {
-	query: '?raw',
-	import: 'default',
-	eager: true
-});
 
 function parse(path: string, metadata: unknown): Post {
 	const [, section, file] = /\/src\/content\/([^/]+)\/([^/]+)\.md$/.exec(path) ?? [];
@@ -104,7 +101,8 @@ function parse(path: string, metadata: unknown): Post {
 	if (result.data.section !== section) {
 		throw new Error(`${path}: frontmatter section "${result.data.section}" must match its folder`);
 	}
-	const words = (rawFiles[path] ?? '').split(/\s+/).length;
+	// Build-time only: read the source to count words (mdsvex also intercepts `?raw` imports).
+	const words = readFileSync(join(process.cwd(), path), 'utf8').split(/\s+/).length;
 	return {
 		...result.data,
 		slug: file,

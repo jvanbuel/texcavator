@@ -33,6 +33,31 @@ const highlighter = await createHighlighter({
 export default defineConfig({
 	plugins: [
 		tailwindcss(),
+		// mdsvex 1.x is a Vite plugin (not a Svelte preprocessor) and emits Svelte 5's `<script module>`.
+		mdsvex({
+			extensions: ['.md'],
+			// Highlight at build time; no JS ships to the reader. Inline code stays plain.
+			highlight: (code, { lang, inline }) =>
+				inline
+					? null
+					: highlighter.codeToHtml(code, {
+							lang: highlighter.getLoadedLanguages().includes(lang) ? lang : 'text',
+							theme,
+							transformers: [
+								{
+									pre(node) {
+										// Browsers already make scrollable blocks keyboard-focusable; Svelte's a11y check flags the tabindex.
+										delete node.properties.tabindex;
+										// The CRT background comes from the stylesheet (--terminal), not the Shiki theme.
+										node.properties.style = String(node.properties.style ?? '').replace(
+											/background-color:[^;]+;?/,
+											''
+										);
+									}
+								}
+							]
+						})
+		}),
 		sveltekit({
 			compilerOptions: {
 				// Force runes mode for the project, except for libraries. Can be removed in svelte 6.
@@ -41,21 +66,7 @@ export default defineConfig({
 			},
 			// 404.html: the site's error page, served by Cloudflare for unknown paths.
 			adapter: adapter({ fallback: '404.html' }),
-			preprocess: [
-				mdsvex({
-					extensions: ['.svx', '.md'],
-					highlight: {
-						// Highlight at build time; no JS ships to the reader.
-						highlighter: (code, lang) => {
-							const language =
-								lang && highlighter.getLoadedLanguages().includes(lang) ? lang : 'text';
-							const html = highlighter.codeToHtml(code, { lang: language, theme });
-							return `{@html ${JSON.stringify(html)}}`;
-						}
-					}
-				})
-			],
-			extensions: ['.svelte', '.svx', '.md']
+			extensions: ['.svelte', '.md']
 		})
 	]
 });
