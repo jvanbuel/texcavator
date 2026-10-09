@@ -6,6 +6,6 @@
 	let { data }: PageProps = $props();
 </script>
 
-<Seo title={data.section.name} description={data.section.description} path="/{data.section.slug}" />
+<Seo title="Blog" path="/blog" />
 <h1 class="mb-6 text-4xl">Blog</h1>
-<BlogTabs active={data.section.slug} posts={data.posts} />
+<BlogTabs active="all" posts={data.posts} />

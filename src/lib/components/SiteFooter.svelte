@@ -11,6 +11,7 @@
 			<p class="font-mono text-xs tracking-[0.12em] uppercase">{site.tagline}</p>
 			<p class="flex gap-5 text-sm">
 				<a href={resolve('/rss.xml')} class="underline underline-offset-4">RSS</a>
+				<a href={resolve('/blog')} class="underline underline-offset-4">Blog</a>
 				<a href={resolve('/tags')} class="underline underline-offset-4">Tags</a>
 				<a href={site.repo} rel="external" class="underline underline-offset-4">Source</a>
 			</p>

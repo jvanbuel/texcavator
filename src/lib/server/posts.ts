@@ -80,9 +80,11 @@ export async function getPost(section: string, slug: string) {
 }
 
 export async function getTags() {
-	const counts = new Map<string, number>();
-	for (const p of await getPosts()) for (const t of p.tags) counts.set(t, (counts.get(t) ?? 0) + 1);
-	return [...counts]
-		.map(([tag, count]) => ({ tag, count }))
-		.sort((a, b) => a.tag.localeCompare(b.tag));
+	const byTag = new Map<string, Post[]>();
+	for (const p of await getPosts()) {
+		for (const t of p.tags) byTag.set(t, [...(byTag.get(t) ?? []), p]);
+	}
+	return [...byTag]
+		.map(([tag, posts]) => ({ tag, count: posts.length, posts }))
+		.sort((a, b) => b.count - a.count || a.tag.localeCompare(b.tag));
 }

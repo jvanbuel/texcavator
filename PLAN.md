@@ -56,18 +56,23 @@ Two things to fix during import:
 
 ## 4. Information architecture
 
+Top navigation: **Blog · Tags · About** (plus the theme toggle). The sections are tabs on the Blog page rather than top-level nav items.
+
 ```
-/                     Home: hero with logo + tagline, one strip per section, latest posts
-/posts                All posts, newest first, filterable by section
-/fossils              FOSSils section landing (intro + its posts)
-/ettymology           eTTYmology section landing
-/[section]/[slug]     A post, e.g. /ettymology/ping
-/tags                 Tag index (e.g. unix, games, formats, cloud-native, security)
+/                     Home: hero with logo + tagline, latest posts, one strip per section
+/blog                 Blog: tabs All | FOSSils | eTTYmology | Bugs in Amber, showing all posts
+/fossils              The FOSSils tab (intro, RSS link, its posts)
+/ettymology           The eTTYmology tab
+/bugs-in-amber        The Bugs in Amber tab
+/[section]/[slug]     A post, e.g. /ettymology/why-usr-exists
+/tags                 Tags page: one card per tag (name, post count, latest titles)
 /tags/[tag]           Posts with that tag
 /about                What Texcavator is, who writes it, how sources are handled
-/rss.xml              RSS feed (prerendered +server.ts)
-/sitemap.xml          Sitemap (prerendered +server.ts)
+/rss.xml              RSS feed (global); /[section]/rss.xml per section
+/sitemap.xml          Sitemap
 ```
+
+Each tab is a real link to its own prerendered page (built with shadcn's Tabs, rendering the triggers as anchors), so every section keeps a shareable URL and its own RSS feed, and the page works without JavaScript.
 
 ## 4b. Sections
 
@@ -201,7 +206,7 @@ texcavator/
 Milestones 1–4 are built; deployment (milestone 5) needs the Cloudflare Pages project and domain set up in the dashboard.
 
 - **SvelteKit 3.** The scaffold is Kit 3, which configures Kit inside `vite.config.ts` and uses `#lib/*` subpath imports instead of `$lib`. Imports therefore need explicit extensions (`#lib/utils.ts`, `#lib/components/ui/button/index.ts`).
-- **shadcn-svelte components come from the real project.** The registry host (`shadcn-svelte.com`) is blocked by this environment's egress policy, so the registry was built from a clone of [huntabyte/shadcn-svelte](https://github.com/huntabyte/shadcn-svelte) on GitHub (commit `493481f`), served on localhost, and installed with that repo's own CLI (v1.7.0, `COMPONENTS_REGISTRY_URL` override). Preset: **Vega** style, stone base, Lucide icons, IBM Plex Sans body and Space Grotesk headings (the logo's fonts). Installed: `button`, `badge`, `card`, `separator`, `sheet` (mobile menu), `tooltip` (theme toggle) and `toggle`. `components.json` points at the official registry, so later `npx shadcn-svelte add <component>` works wherever that host is reachable. Do not hand-edit files in `src/lib/components/ui/`; ESLint's `no-navigation-without-resolve` is switched off for that folder so the generated code stays pristine.
+- **shadcn-svelte components come from the real project.** The registry host (`shadcn-svelte.com`) is blocked by this environment's egress policy, so the registry was built from a clone of [huntabyte/shadcn-svelte](https://github.com/huntabyte/shadcn-svelte) on GitHub (commit `493481f`), served on localhost, and installed with that repo's own CLI (v1.7.0, `COMPONENTS_REGISTRY_URL` override). Preset: **Vega** style, stone base, Lucide icons, IBM Plex Sans body and Space Grotesk headings (the logo's fonts). Installed: `button`, `badge`, `card`, `separator`, `tabs` (blog sections) and `tooltip` (theme toggle). `components.json` points at the official registry, so later `npx shadcn-svelte add <component>` works wherever that host is reachable. Do not hand-edit files in `src/lib/components/ui/`; ESLint's `no-navigation-without-resolve` is switched off for that folder so the generated code stays pristine.
 - **Light-mode primary is Umber (`#8a5528`), not Rust.** Rust on the cream background fails WCAG AA for text, so Rust stays a logo and decoration colour. All token pairs were checked (4.5:1 or better). Section accents use text-safe variants: Umber (FOSSils), a darker green (eTTYmology) and `#96560f` (Bugs in Amber) in light mode, with Ochre, Phosphor and a brighter amber in dark mode.
 - **Code blocks use one dark Shiki theme** (`vitesse-dark`) on the CRT background in both colour modes, instead of two themes.
 - **Post parsing is server-only.** `src/lib/server/posts.ts` (zod, globbing, sorting) runs only in `+page.server.ts` loads at build time. The post page lazily imports just its own Markdown component, so no post index or zod ships to the browser.

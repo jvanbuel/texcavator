@@ -23,7 +23,7 @@
 	<p class="label !text-base text-primary">{site.tagline}</p>
 	<p class="max-w-prose text-xl text-muted-foreground">{site.description}</p>
 	<p class="flex flex-wrap gap-3">
-		<Button href={resolve('/posts')}>All posts</Button>
+		<Button href={resolve('/blog')}>Read the blog</Button>
 		<Button href={resolve('/about')} variant="outline">About</Button>
 	</p>
 </section>

@@ -1,16 +1,7 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
-	import { afterNavigate } from '$app/navigation';
-	import { Menu } from '@lucide/svelte';
 	import Logo from './Logo.svelte';
 	import ThemeToggle from './ThemeToggle.svelte';
-	import SectionName from './SectionName.svelte';
-	import { buttonVariants } from '#lib/components/ui/button/index.ts';
-	import * as Sheet from '#lib/components/ui/sheet/index.ts';
-	import { sections } from '#lib/sections.ts';
-
-	let open = $state(false);
-	afterNavigate(() => (open = false));
 </script>
 
 <a
@@ -21,39 +12,19 @@
 </a>
 <header class="border-b">
 	<div
-		class="mx-auto flex max-w-5xl flex-wrap items-center justify-between gap-x-6 gap-y-3 px-5 py-4"
+		class="mx-auto flex max-w-5xl flex-wrap items-center justify-between gap-x-4 gap-y-2 px-5 py-4"
 	>
-		<a href={resolve('/')} aria-label="Texcavator home"><Logo size={36} /></a>
-		<div class="flex items-center gap-2">
-			<nav aria-label="Main" class="hidden items-center gap-x-5 text-sm sm:flex">
-				{#each sections as s (s.slug)}
-					<a href={resolve('/[section]', { section: s.slug })} class="hover:underline"
-						><SectionName slug={s.slug} /></a
-					>
-				{/each}
-				<a href={resolve('/about')} class="hover:underline">About</a>
-			</nav>
+		<a href={resolve('/')} aria-label="Texcavator home"
+			><Logo
+				size={36}
+				class="gap-2 sm:gap-3 [&>span:last-child]:text-xl sm:[&>span:last-child]:text-2xl"
+			/></a
+		>
+		<nav aria-label="Main" class="flex items-center gap-3 text-sm font-medium sm:gap-6">
+			<a href={resolve('/blog')} class="hover:underline">Blog</a>
+			<a href={resolve('/tags')} class="hover:underline">Tags</a>
+			<a href={resolve('/about')} class="hover:underline">About</a>
 			<ThemeToggle />
-			<Sheet.Root bind:open>
-				<Sheet.Trigger
-					class={buttonVariants({ variant: 'ghost', size: 'icon' }) + ' sm:hidden'}
-					aria-label="Open menu"
-				>
-					<Menu />
-				</Sheet.Trigger>
-				<Sheet.Content side="right">
-					<Sheet.Header>
-						<Sheet.Title>Menu</Sheet.Title>
-						<Sheet.Description class="sr-only">Site navigation</Sheet.Description>
-					</Sheet.Header>
-					<nav aria-label="Mobile" class="grid gap-5 px-6 text-lg">
-						{#each sections as s (s.slug)}
-							<a href={resolve('/[section]', { section: s.slug })}><SectionName slug={s.slug} /></a>
-						{/each}
-						<a href={resolve('/about')}>About</a>
-					</nav>
-				</Sheet.Content>
-			</Sheet.Root>
-		</div>
+		</nav>
 	</div>
 </header>

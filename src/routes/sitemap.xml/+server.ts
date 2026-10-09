@@ -8,7 +8,7 @@ export async function GET() {
 	const posts = await getPosts();
 	const urls = [
 		{ loc: '/' },
-		{ loc: '/posts' },
+		{ loc: '/blog' },
 		{ loc: '/about' },
 		{ loc: '/tags' },
 		...sectionSlugs.map((s) => ({ loc: `/${s}` })),
