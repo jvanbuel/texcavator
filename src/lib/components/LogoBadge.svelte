@@ -1,27 +1,10 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
 	import { cn } from '#lib/utils.js';
 
 	let { class: className }: { class?: string } = $props();
 
-	// The terminal's face squints: "> -" becomes "> <". Once briefly after load, and for as long
-	// as the pointer rests on the badge. The load squint is skipped when motion is reduced.
-	let hovering = $state(false);
-	let flash = $state(false);
-	const squint = $derived(hovering || flash);
-
-	onMount(() => {
-		if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-		let end: ReturnType<typeof setTimeout> | undefined;
-		const start = setTimeout(() => {
-			flash = true;
-			end = setTimeout(() => (flash = false), 300);
-		}, 900);
-		return () => {
-			clearTimeout(start);
-			clearTimeout(end);
-		};
-	});
+	// The terminal's face squints ("> -" becomes "> <") for as long as the pointer rests on it.
+	let squint = $state(false);
 </script>
 
 <!--
@@ -29,8 +12,8 @@
 	static/brand/texcavator-icon-{light,dark}.svg; keep them in sync. Decorative.
 -->
 <svg
-	onpointerenter={() => (hovering = true)}
-	onpointerleave={() => (hovering = false)}
+	onpointerenter={() => (squint = true)}
+	onpointerleave={() => (squint = false)}
 	viewBox="8 8 184 184"
 	aria-hidden="true"
 	focusable="false"
@@ -111,8 +94,8 @@
 	<circle cx="100" cy="100" r="84" fill="none" stroke="#2B2B2B" stroke-width="6" />
 </svg>
 <svg
-	onpointerenter={() => (hovering = true)}
-	onpointerleave={() => (hovering = false)}
+	onpointerenter={() => (squint = true)}
+	onpointerleave={() => (squint = false)}
 	viewBox="8 8 184 184"
 	aria-hidden="true"
 	focusable="false"

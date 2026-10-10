@@ -45,9 +45,10 @@
 	<div class="grid items-center gap-6 md:grid-cols-[minmax(0,1fr)_auto] md:gap-12">
 		<div class="grid gap-8">
 			<h1
-				class="max-w-[14ch] text-[clamp(3rem,9vw,6rem)] leading-[0.95] tracking-[-0.035em] text-balance"
+				class="max-w-[16ch] text-[clamp(3rem,9vw,6rem)] leading-[0.95] tracking-[-0.035em] text-balance"
 			>
-				Digging up tech history.
+				Digging up <br class="hidden md:inline" />Bits of <br class="hidden md:inline" />Tech
+				History
 			</h1>
 			<p class="max-w-[52ch] text-xl text-muted-foreground sm:text-2xl">{site.description}</p>
 		</div>
