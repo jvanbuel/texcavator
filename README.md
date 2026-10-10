@@ -1,8 +1,15 @@
-# texcavator
+<p align="center">
+  <a href="https://texcavator.dev">
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset="brand/texcavator-logo-dark.svg">
+      <img src="brand/texcavator-logo-light.svg" alt="Texcavator: digging up tech history" width="480">
+    </picture>
+  </a>
+</p>
 
-Source for [texcavator.dev](https://texcavator.dev): _digging up tech history_. A static blog of short, sourced stories about the decisions, accidents and people behind the tools we use.
+Source for [texcavator.dev](https://texcavator.dev): digging up bits of tech history. Stories, lore and trivia from ancient tech, the dinosaurs still among us, and the people who built them.
 
-SvelteKit (static adapter) · mdsvex · Tailwind CSS v4 · shadcn-style components · Shiki. Hosted on Cloudflare Pages. The full design is in [PLAN.md](PLAN.md).
+SvelteKit (static adapter) · mdsvex · Tailwind CSS v4 · shadcn-svelte · Shiki. Hosted on Cloudflare Workers (static assets). The full design is in [PLAN.md](PLAN.md).
 
 ## Develop
 
