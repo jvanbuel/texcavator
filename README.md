@@ -2,7 +2,7 @@
   <a href="https://texcavator.dev">
     <picture>
       <source media="(prefers-color-scheme: dark)" srcset="brand/texcavator-logo-dark.svg">
-      <img src="brand/texcavator-logo-light.svg" alt="Texcavator: digging up tech history" width="480">
+      <img src="brand/texcavator-logo-light.svg" alt="Texcavator: digging up tech history" width="440">
     </picture>
   </a>
 </p>

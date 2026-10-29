@@ -10,14 +10,14 @@
 
 <span class={cn('inline-flex items-center gap-3', className)}>
 	<img
-		src="/brand/texcavator-icon-light.svg"
+		src="/brand/texcavator-mark-light.svg"
 		alt=""
 		width={size}
 		height={size}
 		class="block dark:hidden"
 	/>
 	<img
-		src="/brand/texcavator-icon-dark.svg"
+		src="/brand/texcavator-mark-dark.svg"
 		alt=""
 		width={size}
 		height={size}
