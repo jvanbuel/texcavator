@@ -9,3 +9,10 @@
 
 /brand/*
   Cache-Control: public, max-age=86400
+
+# The playable Space Travel port (WebAssembly). Replaces the site-wide CSP:
+# 'wasm-unsafe-eval' lets the browser compile the game, and frame-ancestors
+# 'self' lets posts on this site embed it in an iframe.
+/play/*
+  ! Content-Security-Policy
+  Content-Security-Policy: default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval'; font-src 'self'; frame-ancestors 'self'; base-uri 'self'; form-action 'self'

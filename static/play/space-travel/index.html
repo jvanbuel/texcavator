@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover" />
+    <title>Space Travel</title>
+    
+<script type="module">
+import init, * as bindings from '/play/space-travel/space-travel-f4712a3b2267e386.js';
+const wasm = await init({ module_or_path: '/play/space-travel/space-travel-3b50a4102c95f6d5_bg.wasm' });
+
+
+window.wasmBindings = bindings;
+
+
+dispatchEvent(new CustomEvent("TrunkApplicationStarted", {detail: {wasm}}));
+
+</script>
+    <style>
+      :root { --bg: #000; --fg: #c8ffcd; --dim: #2f6b3c; --pad: rgba(20, 60, 30, 0.55); --pad-on: rgba(90, 200, 120, 0.6); color-scheme: dark; }
+      html, body { margin: 0; height: 100%; overflow: hidden; background: var(--bg); color: var(--fg); }
+      /* The game grid fills the viewport; ratzilla sizes its grid from this. */
+      #game { position: fixed; inset: 0; overflow: hidden; }
+      pre { font-family: "DejaVu Sans Mono", Menlo, Consolas, monospace; font-size: 14px; margin: 0; color: var(--fg); }
+
+      /* Touch controls: only on touch screens. Each button sends the same key
+         the keyboard would, so the game needs no separate touch input. */
+      #touch { display: none; }
+      @media (pointer: coarse) {
+        #touch {
+          display: flex; justify-content: space-between; align-items: flex-end;
+          position: fixed; left: 0; right: 0; bottom: 0; z-index: 5;
+          padding: 12px max(12px, env(safe-area-inset-right, 0px)) max(12px, env(safe-area-inset-bottom, 0px)) max(12px, env(safe-area-inset-left, 0px));
+          pointer-events: none;
+        }
+      }
+      /* Landscape: the game sits at the left, so keep both clusters right. */
+      @media (pointer: coarse) and (orientation: landscape) {
+        #touch { justify-content: flex-end; gap: 20px; }
+      }
+      .cluster { display: grid; gap: 10px; pointer-events: auto; }
+      .left { grid-template-columns: repeat(2, 64px); grid-template-areas: "reset new" "ccw cw"; }
+      .right { grid-template-columns: repeat(2, 64px); grid-template-areas: "zout zin" "back back" "fwd fwd"; }
+      #touch button {
+        height: 56px; border: 1px solid var(--dim); border-radius: 12px; background: var(--pad); color: var(--fg);
+        font: 600 20px/1 "DejaVu Sans Mono", Menlo, Consolas, monospace;
+        touch-action: none; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none;
+      }
+      #touch button.small { height: 40px; font-size: 14px; letter-spacing: 0.06em; }
+      #touch button.on { background: var(--pad-on); }
+      /* How-to-play panel; doubles as the loading / error screen. */
+      #intro {
+        position: fixed; inset: 0; z-index: 10; display: flex; align-items: center; justify-content: center;
+        padding: max(16px, env(safe-area-inset-top, 0px)) max(16px, env(safe-area-inset-right, 0px)) max(16px, env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px));
+        background: rgba(0, 0, 0, 0.82); overflow: auto;
+      }
+      #intro[hidden] { display: none; }
+      .panel {
+        max-width: 34rem; max-height: 100%; overflow: auto; box-sizing: border-box; padding: 20px 22px;
+        border: 1px solid var(--dim); border-radius: 10px; background: #020a04;
+        font: 15px/1.5 "DejaVu Sans Mono", Menlo, Consolas, monospace; color: var(--fg);
+      }
+      .panel h1 { margin: 0 0 2px; font-size: 22px; letter-spacing: 0.04em; text-wrap: balance; }
+      .panel .sub { margin: 0 0 14px; color: #7fbf8c; font-size: 13px; }
+      .panel ol { margin: 0 0 12px; padding-left: 1.3em; display: grid; gap: 8px; }
+      .panel p { margin: 0 0 12px; }
+      .panel kbd { border: 1px solid var(--dim); border-radius: 4px; padding: 0 5px; font: inherit; }
+      .panel .touch-only { display: none; }
+      @media (pointer: coarse) { .panel .touch-only { display: inline; } .panel .key-only { display: none; } }
+      #start {
+        margin-top: 4px; width: 100%; height: 48px; border: 1px solid var(--dim); border-radius: 10px;
+        background: var(--pad-on); color: #001a06; font: 700 16px/1 "DejaVu Sans Mono", Menlo, Consolas, monospace; letter-spacing: 0.08em;
+      }
+      #start:disabled { background: var(--pad); color: var(--fg); }
+      #start:focus-visible, #help:focus-visible { outline: 2px solid var(--fg); outline-offset: 2px; }
+      #status.error { color: #ff9a8a; }
+      #help {
+        position: fixed; z-index: 6; top: max(8px, env(safe-area-inset-top, 0px)); right: max(8px, env(safe-area-inset-right, 0px));
+        width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--dim); background: var(--pad); color: var(--fg);
+        font: 700 18px/1 "DejaVu Sans Mono", Menlo, Consolas, monospace;
+      }
+    </style>
+  <link rel="modulepreload" href="/play/space-travel/space-travel-f4712a3b2267e386.js" crossorigin="anonymous" integrity="sha384-zPKI1mN0kLzjjfGfwYbN1ANd8tJiPMcpbmLZjYcsVutS+XRCQeoB8eWPx2DhnaVB"><link rel="preload" href="/play/space-travel/space-travel-3b50a4102c95f6d5_bg.wasm" crossorigin="anonymous" integrity="sha384-PnCsRlylfapOfOOuFlal1eHqUya/EN0K9Klpa6jvkvm7sLoap0TVcM147vyaM0EV" as="fetch" type="application/wasm"></head>
+  <body>
+    <div id="intro" role="dialog" aria-labelledby="intro-title">
+      <div class="panel">
+        <h1 id="intro-title">Space Travel</h1>
+        <p class="sub">Ken Thompson, PDP-7, 1969. Ported to Rust.</p>
+        <p>You start parked on Earth. The ship is always at the centre of the crosshair, and the view turns with it. At first Earth is too small to see, so the screen looks empty.</p>
+        <ol>
+          <li><b>Zoom in</b> with <span class="touch-only">+</span><span class="key-only"><kbd>+</kbd></span> about 8 times: Earth's outline appears. The number at the bottom is the zoom.</li>
+          <li><b>Take off</b>: zoom in to about <b>−18</b>, then hold <span class="touch-only">▼</span><span class="key-only"><kbd>↓</kbd></span>. Thrust gets stronger as you zoom out, so stay zoomed in for gentle flying.</li>
+          <li><b>Steer</b> with <span class="touch-only">⟲ ⟳</span><span class="key-only"><kbd>←</kbd> <kbd>→</kbd></span>; <span class="touch-only">▲</span><span class="key-only"><kbd>↑</kbd></span> thrusts the other way.</li>
+          <li><b>Land</b> on any planet or moon slower than about 1 km/s. <b>L</b> means landed, <b>CL</b> means you crashed: press <span class="touch-only">RESET</span><span class="key-only"><kbd>r</kbd></span> to clear it and take off again from there.</li>
+          <li><b>Lost?</b> <span class="touch-only">NEW</span><span class="key-only"><kbd>n</kbd></span> starts over, parked on Earth.</li>
+        </ol>
+        <p>Zoom out to find the Moon, the Sun and the planets. The name at the bottom left is the body whose gravity you are in.</p>
+        <p id="status" aria-live="polite">Loading the game…</p>
+        <button id="start" type="button" disabled>Loading…</button>
+      </div>
+    </div>
+    <button id="help" type="button" aria-label="How to play">?</button>
+    <div id="game"></div>
+    <div id="touch" aria-label="Touch controls">
+      <div class="cluster left">
+        <button class="small" style="grid-area: reset" data-key="r" aria-label="Clear crash">RESET</button>
+        <button class="small" style="grid-area: new" data-key="n" aria-label="New game">NEW</button>
+        <button style="grid-area: ccw" data-key="ArrowLeft" data-hold aria-label="Turn left">⟲</button>
+        <button style="grid-area: cw" data-key="ArrowRight" data-hold aria-label="Turn right">⟳</button>
+      </div>
+      <div class="cluster right">
+        <button class="small" style="grid-area: zout" data-key="-" aria-label="Zoom out">−</button>
+        <button class="small" style="grid-area: zin" data-key="+" aria-label="Zoom in">+</button>
+        <button style="grid-area: back" data-key="ArrowUp" data-hold aria-label="Thrust up">▲</button>
+        <button style="grid-area: fwd" data-key="ArrowDown" data-hold aria-label="Thrust down">▼</button>
+      </div>
+    </div>
+    <script type="module">
+      const intro = document.getElementById("intro");
+      // How-to-play panel. The game signals it is running with
+      // TrunkApplicationStarted; a load failure shows here instead of a
+      // silent black page.
+      const start = document.getElementById("start");
+      const status = document.getElementById("status");
+      const ready = () => { start.disabled = false; start.textContent = "START"; status.textContent = "Ready."; start.focus(); };
+      const failed = (msg) => {
+        status.className = "error";
+        status.textContent = "The game could not start in this browser: " + msg;
+        start.textContent = "Not available";
+      };
+      if (window.gameStarted || window.wasmBindings) ready(); else addEventListener("TrunkApplicationStarted", ready);
+      addEventListener("gamefailed", (e) => failed(e.detail));
+      addEventListener("unhandledrejection", (e) => { if (start.disabled) failed(String(e.reason?.message ?? e.reason)); });
+      setTimeout(() => { if (start.disabled && !status.classList.contains("error")) failed("it did not finish loading after 15 seconds."); }, 15000);
+      start.addEventListener("click", () => { intro.hidden = true; start.blur(); });
+      document.getElementById("help").addEventListener("click", (e) => { e.stopPropagation(); intro.hidden = false; start.focus(); });
+
+      // Touch buttons send keydown events to the window, where the game
+      // listens for keys. Held buttons repeat
+      // faster than the game's 0.12 s hold window, so holding thrusts or turns
+      // continuously, like a held key.
+      const send = (key) => dispatchEvent(new KeyboardEvent("keydown", { key }));
+      for (const b of document.querySelectorAll("#touch button")) {
+        let timer = null;
+        const stop = () => { clearInterval(timer); timer = null; b.classList.remove("on"); };
+        b.addEventListener("pointerdown", (e) => {
+          e.preventDefault();
+          b.setPointerCapture(e.pointerId);
+          b.classList.add("on");
+          send(b.dataset.key);
+          if (b.hasAttribute("data-hold")) timer = setInterval(() => send(b.dataset.key), 50);
+        });
+        for (const t of ["pointerup", "pointercancel", "lostpointercapture"]) b.addEventListener(t, stop);
+        b.addEventListener("contextmenu", (e) => e.preventDefault());
+      }
+    </script>
+  </body>
+</html>

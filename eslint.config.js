@@ -10,6 +10,8 @@ const gitignorePath = path.resolve(import.meta.dirname, '.gitignore');
 
 export default defineConfig(
 	includeIgnoreFile(gitignorePath),
+	// Built bundles copied in as-is (e.g. the Space Travel WebAssembly game).
+	{ ignores: ['static/play/'] },
 	js.configs.recommended,
 	ts.configs.recommended,
 	svelte.configs.recommended,
