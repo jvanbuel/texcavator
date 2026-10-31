@@ -6,8 +6,8 @@
     <title>Space Travel</title>
     
 <script type="module">
-import init, * as bindings from '/play/space-travel/space-travel-f4712a3b2267e386.js';
-const wasm = await init({ module_or_path: '/play/space-travel/space-travel-3b50a4102c95f6d5_bg.wasm' });
+import init, * as bindings from '/play/space-travel/space-travel-8bddfd7726473a5d.js';
+const wasm = await init({ module_or_path: '/play/space-travel/space-travel-73d6877900f9305e_bg.wasm' });
 
 
 window.wasmBindings = bindings;
@@ -19,9 +19,16 @@ dispatchEvent(new CustomEvent("TrunkApplicationStarted", {detail: {wasm}}));
     <style>
       :root { --bg: #000; --fg: #c8ffcd; --dim: #2f6b3c; --pad: rgba(20, 60, 30, 0.55); --pad-on: rgba(90, 200, 120, 0.6); color-scheme: dark; }
       html, body { margin: 0; height: 100%; overflow: hidden; background: var(--bg); color: var(--fg); }
-      /* The game grid fills the viewport; ratzilla sizes its grid from this. */
-      #game { position: fixed; inset: 0; overflow: hidden; }
-      pre { font-family: "DejaVu Sans Mono", Menlo, Consolas, monospace; font-size: 14px; margin: 0; color: var(--fg); }
+      /* The vector display: a canvas the game draws on. It fills the window,
+         minus the touch controls on phones (see below). */
+      #display { position: fixed; inset: 0; }
+      #screen { display: block; width: 100%; height: 100%; }
+      @media (pointer: coarse) {
+        #display { bottom: calc(210px + env(safe-area-inset-bottom, 0px)); }
+      }
+      @media (pointer: coarse) and (orientation: landscape) {
+        #display { bottom: 0; right: calc(330px + env(safe-area-inset-right, 0px)); }
+      }
 
       /* Touch controls: only on touch screens. Each button sends the same key
          the keyboard would, so the game needs no separate touch input. */
@@ -80,7 +87,7 @@ dispatchEvent(new CustomEvent("TrunkApplicationStarted", {detail: {wasm}}));
         font: 700 18px/1 "DejaVu Sans Mono", Menlo, Consolas, monospace;
       }
     </style>
-  <link rel="modulepreload" href="/play/space-travel/space-travel-f4712a3b2267e386.js" crossorigin="anonymous" integrity="sha384-zPKI1mN0kLzjjfGfwYbN1ANd8tJiPMcpbmLZjYcsVutS+XRCQeoB8eWPx2DhnaVB"><link rel="preload" href="/play/space-travel/space-travel-3b50a4102c95f6d5_bg.wasm" crossorigin="anonymous" integrity="sha384-PnCsRlylfapOfOOuFlal1eHqUya/EN0K9Klpa6jvkvm7sLoap0TVcM147vyaM0EV" as="fetch" type="application/wasm"></head>
+  <link rel="modulepreload" href="/play/space-travel/space-travel-8bddfd7726473a5d.js" crossorigin="anonymous" integrity="sha384-1Q5WY5jt6xddWMYDvVp/1HIhDp2jJ50sG8Sle84rNmeN4rnS6ZInvJ6iKRJ1gYnQ"><link rel="preload" href="/play/space-travel/space-travel-73d6877900f9305e_bg.wasm" crossorigin="anonymous" integrity="sha384-BtStr0/XW+Wl2/xe+/R151ZQ4xrQC8O8xbET06svwi1PGW+xxvIbs0sm1khyPUQV" as="fetch" type="application/wasm"></head>
   <body>
     <div id="intro" role="dialog" aria-labelledby="intro-title">
       <div class="panel">
@@ -100,7 +107,7 @@ dispatchEvent(new CustomEvent("TrunkApplicationStarted", {detail: {wasm}}));
       </div>
     </div>
     <button id="help" type="button" aria-label="How to play">?</button>
-    <div id="game"></div>
+    <div id="display"><canvas id="screen" role="img" aria-label="Space Travel vector display"></canvas></div>
     <div id="touch" aria-label="Touch controls">
       <div class="cluster left">
         <button class="small" style="grid-area: reset" data-key="r" aria-label="Clear crash">RESET</button>
