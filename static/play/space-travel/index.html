@@ -6,8 +6,8 @@
     <title>Space Travel</title>
     
 <script type="module">
-import init, * as bindings from '/play/space-travel/space-travel-8bddfd7726473a5d.js';
-const wasm = await init({ module_or_path: '/play/space-travel/space-travel-73d6877900f9305e_bg.wasm' });
+import init, * as bindings from '/play/space-travel/space-travel-27f515ad795b05f1.js';
+const wasm = await init({ module_or_path: '/play/space-travel/space-travel-489aabcef1c13abc_bg.wasm' });
 
 
 window.wasmBindings = bindings;
@@ -81,13 +81,18 @@ dispatchEvent(new CustomEvent("TrunkApplicationStarted", {detail: {wasm}}));
       #start:disabled { background: var(--pad); color: var(--fg); }
       #start:focus-visible, #help:focus-visible { outline: 2px solid var(--fg); outline-offset: 2px; }
       #status.error { color: #ff9a8a; }
+      #engine {
+        border: 1px solid var(--dim); border-radius: 6px; background: var(--pad); color: var(--fg);
+        font: inherit; padding: 2px 8px; cursor: pointer;
+      }
+      #engine:focus-visible { outline: 2px solid var(--fg); outline-offset: 2px; }
       #help {
         position: fixed; z-index: 6; top: max(8px, env(safe-area-inset-top, 0px)); right: max(8px, env(safe-area-inset-right, 0px));
         width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--dim); background: var(--pad); color: var(--fg);
         font: 700 18px/1 "DejaVu Sans Mono", Menlo, Consolas, monospace;
       }
     </style>
-  <link rel="modulepreload" href="/play/space-travel/space-travel-8bddfd7726473a5d.js" crossorigin="anonymous" integrity="sha384-1Q5WY5jt6xddWMYDvVp/1HIhDp2jJ50sG8Sle84rNmeN4rnS6ZInvJ6iKRJ1gYnQ"><link rel="preload" href="/play/space-travel/space-travel-73d6877900f9305e_bg.wasm" crossorigin="anonymous" integrity="sha384-BtStr0/XW+Wl2/xe+/R151ZQ4xrQC8O8xbET06svwi1PGW+xxvIbs0sm1khyPUQV" as="fetch" type="application/wasm"></head>
+  <link rel="modulepreload" href="/play/space-travel/space-travel-27f515ad795b05f1.js" crossorigin="anonymous" integrity="sha384-yupAIjsd+JsRN7+SC8gyZozxnlEDlKYWg9M9vhigidqFlfIdoWQHyKnL8wYVg2ZD"><link rel="preload" href="/play/space-travel/space-travel-489aabcef1c13abc_bg.wasm" crossorigin="anonymous" integrity="sha384-X89gFMCuMQWz3//Qg9o8+uukMQ2AFDDP7ALnScc1AoJxTaKeVt9WHsqG1oOaX4I1" as="fetch" type="application/wasm"></head>
   <body>
     <div id="intro" role="dialog" aria-labelledby="intro-title">
       <div class="panel">
@@ -102,6 +107,7 @@ dispatchEvent(new CustomEvent("TrunkApplicationStarted", {detail: {wasm}}));
           <li><b>Lost?</b> <span class="touch-only">NEW</span><span class="key-only"><kbd>n</kbd></span> starts over, parked on Earth.</li>
         </ol>
         <p>Zoom out to find the Moon, the Sun and the planets. The name at the bottom left is the body whose gravity you are in.</p>
+        <p>The game runs as the <b>original 1970 machine code</b> on an emulated PDP-7, with its own software floating point. <button id="engine" type="button">Switch to the Rust engine</button> (or press <kbd>m</kbd>) to compare.</p>
         <p id="status" aria-live="polite">Loading the game…</p>
         <button id="start" type="button" disabled>Loading…</button>
       </div>
@@ -140,6 +146,12 @@ dispatchEvent(new CustomEvent("TrunkApplicationStarted", {detail: {wasm}}));
       addEventListener("unhandledrejection", (e) => { if (start.disabled) failed(String(e.reason?.message ?? e.reason)); });
       setTimeout(() => { if (start.disabled && !status.classList.contains("error")) failed("it did not finish loading after 15 seconds."); }, 15000);
       start.addEventListener("click", () => { intro.hidden = true; start.blur(); });
+      // Switching engine starts a new game in the other one.
+      let original = true;
+      const engine = document.getElementById("engine");
+      const engineLabel = () => engine.textContent = original ? "Switch to the Rust engine" : "Switch back to the 1970 code";
+      engine.addEventListener("click", () => { dispatchEvent(new KeyboardEvent("keydown", { key: "m" })); original = !original; engineLabel(); });
+      addEventListener("keydown", (e) => { if (e.key === "m" && e.isTrusted) { original = !original; engineLabel(); } });
       document.getElementById("help").addEventListener("click", (e) => { e.stopPropagation(); intro.hidden = false; start.focus(); });
 
       // Touch buttons send keydown events to the window, where the game

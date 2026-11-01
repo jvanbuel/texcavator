@@ -68,8 +68,10 @@ than a dot. Zoom in with `+` about eight times and its outline appears. To take 
 `-18` and hold `↓`. Steer with `←` and `→`, and land on anything slower than about 1 km/s. `L` means
 landed, `CL` means crashed.
 
-This is a port to Rust of the surviving 1970 listing, about 1,400 lines of PDP-7 assembly. It follows
-the original routine by routine.
+What you are flying is the original program. The surviving 1970 listing, about 1,400 lines of PDP-7
+assembly, is assembled into the same 3,014 words it occupied then and run on a small PDP-7 emulator
+written in Rust. Press `m` to switch to a Rust translation of the same code that uses modern 64-bit
+floats, and compare.
 
 ## What is in the listing
 
@@ -91,6 +93,23 @@ scale one burst sends you off at thousands of kilometres a second.
 - **A number that isn't octal.** The crash threshold's exponent is written `-028`. Read the 8 as an
   octal digit anyway and it is -24, which makes landing above about 1.1 km/s a crash.
 - **Floats in software.** The PDP-7 had no floating-point hardware. The game's package stores each
-  number in three 18-bit words, and the game multiplies by powers of two by adding to the exponent
-  word directly. The port decodes the original tables from those words and does the arithmetic in
-  ordinary 64-bit floats.
+  number in three 18-bit words: an exponent, then a sign and 35 bits of mantissa. The game multiplies
+  by powers of two by adding to the exponent word directly.
+
+## Bugs in the floating point
+
+Running the original code next to the 64-bit translation shows where the 1969 arithmetic gives way.
+Multiply and add are good to all 35 bits. The rest is less tidy:
+
+- **Division is good to about 1 part in 30,000.** `fdv` adds 1 to its quotient before the final
+  shift whenever a correction count is not negative, and it never is. It also shifts the divisor
+  with a rotate that pulls in whatever carry bit the caller left behind. The scanned listing has a
+  box drawn around that instruction.
+- **Comparison misjudges close numbers.** When two numbers share their exponent and high word,
+  `fcp` returns the difference of their low words as a signed 18-bit value. A large enough
+  difference sets the sign bit and reads as "less". The game uses it to ask whether the ship is
+  below the surface, so a ship climbing away from Earth is landed again at about 60 m, and the
+  biased division puts it back down 146 m up.
+- **Planets turn into a V.** Zoomed far in, the original draws a planet's surface as two straight
+  lines. The outline is stepped with a quick multiply that keeps 17 bits, so the cosine of a tiny
+  step angle truncates to slightly less than 1 and every step pulls the outline inward.
